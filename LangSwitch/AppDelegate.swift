@@ -9,23 +9,27 @@ import SwiftUI
 import Carbon
 import Foundation
 import AppKit
-
+import AVFoundation
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusBarItem: NSStatusItem?
     var aboutWindow: NSWindow?
+    var soundPlayer: AVAudioPlayer!
+    var permissionsService: PermissionsService = PermissionsService()
+    var keyBuffer: String = "";
     let longPressThreshold: TimeInterval = 0.2;
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Create a status bar item with a system icon
         statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        statusBarItem?.button?.image = NSImage(systemSymbolName: "globe", accessibilityDescription: nil)
+        statusBarItem?.button?.image = NSImage(systemSymbolName: "dollarsign", accessibilityDescription: nil)
         statusBarItem?.isVisible = true
         
         // Add a menu to the status bar item
         let menu = NSMenu()
         menu.addItem(withTitle: "About LangSwitch", action: #selector(showAboutWindow), keyEquivalent: "")
         menu.addItem(withTitle: "Hide Icon", action: #selector(hideStatusBarIcon), keyEquivalent: "")
+        menu.addItem(withTitle: "Request permissions", action: #selector(showPermissionWindow), keyEquivalent: "")
         menu.addItem(withTitle: "Exit", action: #selector(exitAction), keyEquivalent: "")
         statusBarItem?.menu = menu
         
@@ -34,6 +38,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         var anotherClicked = false;
         var lastPressTime = Date();
+        
+        permissionsService.pollAccessibilityPrivileges()
+       
+        NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
+            print("keyCode: \(event.keyCode)")
+        }
         
         // Register for Fn button press events
         NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { event in
@@ -49,14 +59,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if (event.keyCode == 63 &&
                 !anotherClicked &&
                 event.modifierFlags.intersection(.deviceIndependentFlagsMask) == []) {
-                var timePassed = Date().timeIntervalSince(lastPressTime);
+                let timePassed = Date().timeIntervalSince(lastPressTime);
                 if (timePassed < self.longPressThreshold) {
                     self.switchKeyboardLanguage();
                 }
             }
+            print("Fn keyCode: \(event.keyCode)")
+            if (event.keyCode == 58) { // Option key
+                self.playSound(soundToPlay: "switch")
+            }
         }
     }
     
+    @objc func showPermissionWindow() {
+        let promptFlag = kAXTrustedCheckOptionPrompt.takeRetainedValue() as NSString
+        let myDict: CFDictionary = NSDictionary(dictionary: [promptFlag: true])
+        AXIsProcessTrustedWithOptions(myDict)
+
+        if (AXIsProcessTrustedWithOptions(myDict))
+        {
+            print("AD: Access Granted")
+        } else {
+            print("AD: Access NOT Granted")
+        }
+    }
+        
     @objc func showAboutWindow() {
         if aboutWindow == nil {
             let windowWidth: CGFloat = 300
@@ -91,13 +118,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 
     @objc func openGitHub() {
-        if let url = URL(string: "https://github.com/Nikeev/LangSwitch") {
+        if let url = URL(string: "https://github.com/zadorozhko/LangSwitch") {
             NSWorkspace.shared.open(url)
         }
     }
     
     @objc func checkForUpdates() {
-        guard let url = URL(string: "https://api.github.com/repos/Nikeev/LangSwitch/releases/latest") else { return }
+        guard let url = URL(string: "https://api.github.com/repos/zadorozhko/LangSwitch/releases/latest") else { return }
 
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data, error == nil else {
@@ -139,17 +166,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApplication.shared.terminate(nil)
     }
     
+    func playSound(soundToPlay: String) {
+        let url = Bundle.main.url(forResource: soundToPlay, withExtension: "wav")
+        if (url) != nil {
+            do {
+                soundPlayer = try! AVAudioPlayer(contentsOf: url!)
+                soundPlayer.volume = 1.0
+                soundPlayer.play()
+            }
+        } else {
+            print("Error: Sound \(soundToPlay) not found")
+        }
+    }
+    
     func switchKeyboardLanguage() {
         // Get the current keyboard input source
         guard let currentSource = TISCopyCurrentKeyboardInputSource()?.takeUnretainedValue() else {
-            print("Failed to switch keyboard language.")
+            print("Failed to get current keyboard language.")
             return
         }
         
         // Get all enabled keyboard input sources
         guard let inputSources = getInputSources() as? [TISInputSource],
               !inputSources.isEmpty else {
-            print("Failed to switch keyboard language.")
+            print("Failed to get keyboard languages.")
             return
         }
         
@@ -170,6 +210,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         // Print the new input source's name
         let newSourceName = Unmanaged<CFString>.fromOpaque(TISGetInputSourceProperty(nextSource, kTISPropertyLocalizedName)).takeUnretainedValue() as String
+        if (newSourceName == "ABC") {
+            statusBarItem?.button?.image = NSImage(systemSymbolName: "dollarsign", accessibilityDescription: nil)
+            playSound(soundToPlay: "en")
+        } else {
+            statusBarItem?.button?.image = NSImage(systemSymbolName: "rublesign", accessibilityDescription: nil)
+            playSound(soundToPlay: "ru")
+        }
+        
         print("Switched to: \(newSourceName)")
     }
     

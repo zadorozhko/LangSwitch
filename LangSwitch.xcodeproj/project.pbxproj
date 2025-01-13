@@ -11,6 +11,16 @@
 		4C79BED02A553F0D006A793C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C79BECF2A553F0D006A793C /* AppDelegate.swift */; };
 		4C79BED22A553F0E006A793C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C79BED12A553F0E006A793C /* Assets.xcassets */; };
 		4C79BED52A553F0E006A793C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C79BED42A553F0E006A793C /* Preview Assets.xcassets */; };
+		C891CA302D2D78E300E7E304 /* replace.wav in Resources */ = {isa = PBXBuildFile; fileRef = C891CA292D2D78E300E7E304 /* replace.wav */; };
+		C891CA312D2D78E300E7E304 /* typerus.wav in Resources */ = {isa = PBXBuildFile; fileRef = C891CA2E2D2D78E300E7E304 /* typerus.wav */; };
+		C891CA322D2D78E300E7E304 /* switch.wav in Resources */ = {isa = PBXBuildFile; fileRef = C891CA2C2D2D78E300E7E304 /* switch.wav */; };
+		C891CA332D2D78E300E7E304 /* reverse.wav in Resources */ = {isa = PBXBuildFile; fileRef = C891CA2A2D2D78E300E7E304 /* reverse.wav */; };
+		C891CA342D2D78E300E7E304 /* typeeng.wav in Resources */ = {isa = PBXBuildFile; fileRef = C891CA2D2D2D78E300E7E304 /* typeeng.wav */; };
+		C891CA352D2D78E300E7E304 /* en.wav in Resources */ = {isa = PBXBuildFile; fileRef = C891CA272D2D78E300E7E304 /* en.wav */; };
+		C891CA362D2D78E300E7E304 /* misprint.wav in Resources */ = {isa = PBXBuildFile; fileRef = C891CA282D2D78E300E7E304 /* misprint.wav */; };
+		C891CA372D2D78E300E7E304 /* ru.wav in Resources */ = {isa = PBXBuildFile; fileRef = C891CA2B2D2D78E300E7E304 /* ru.wav */; };
+		C8EB5E062D2EDC7500FF7BEB /* PermissionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EB5E052D2EDC7500FF7BEB /* PermissionsService.swift */; };
+		C8EB5E0B2D2EE2A600FF7BEB /* PermissionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EB5E0A2D2EE2A600FF7BEB /* PermissionsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +49,16 @@
 		4C79BED62A553F0E006A793C /* LangSwitch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LangSwitch.entitlements; sourceTree = "<group>"; };
 		4C79BEDB2A553F0E006A793C /* LangSwitchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LangSwitchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C79BEE52A553F0E006A793C /* LangSwitchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LangSwitchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C891CA272D2D78E300E7E304 /* en.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = en.wav; path = LangSwitch/sounds/en.wav; sourceTree = SOURCE_ROOT; };
+		C891CA282D2D78E300E7E304 /* misprint.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = misprint.wav; sourceTree = "<group>"; };
+		C891CA292D2D78E300E7E304 /* replace.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = replace.wav; sourceTree = "<group>"; };
+		C891CA2A2D2D78E300E7E304 /* reverse.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = reverse.wav; sourceTree = "<group>"; };
+		C891CA2B2D2D78E300E7E304 /* ru.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = ru.wav; path = LangSwitch/sounds/ru.wav; sourceTree = SOURCE_ROOT; };
+		C891CA2C2D2D78E300E7E304 /* switch.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = switch.wav; sourceTree = "<group>"; };
+		C891CA2D2D2D78E300E7E304 /* typeeng.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = typeeng.wav; sourceTree = "<group>"; };
+		C891CA2E2D2D78E300E7E304 /* typerus.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = typerus.wav; sourceTree = "<group>"; };
+		C8EB5E052D2EDC7500FF7BEB /* PermissionsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsService.swift; sourceTree = "<group>"; };
+		C8EB5E0A2D2EE2A600FF7BEB /* PermissionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,9 +107,12 @@
 		4C79BECC2A553F0D006A793C /* LangSwitch */ = {
 			isa = PBXGroup;
 			children = (
+				C8EB5E0A2D2EE2A600FF7BEB /* PermissionsView.swift */,
+				C8EB5E052D2EDC7500FF7BEB /* PermissionsService.swift */,
 				4C79BECD2A553F0D006A793C /* LangSwitchApp.swift */,
 				4C79BECF2A553F0D006A793C /* AppDelegate.swift */,
 				4C79BED12A553F0E006A793C /* Assets.xcassets */,
+				C891CA2F2D2D78E300E7E304 /* sounds */,
 				4C79BED62A553F0E006A793C /* LangSwitch.entitlements */,
 				4C79BED32A553F0E006A793C /* Preview Content */,
 			);
@@ -102,6 +125,21 @@
 				4C79BED42A553F0E006A793C /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		C891CA2F2D2D78E300E7E304 /* sounds */ = {
+			isa = PBXGroup;
+			children = (
+				C891CA272D2D78E300E7E304 /* en.wav */,
+				C891CA282D2D78E300E7E304 /* misprint.wav */,
+				C891CA292D2D78E300E7E304 /* replace.wav */,
+				C891CA2A2D2D78E300E7E304 /* reverse.wav */,
+				C891CA2B2D2D78E300E7E304 /* ru.wav */,
+				C891CA2C2D2D78E300E7E304 /* switch.wav */,
+				C891CA2D2D2D78E300E7E304 /* typeeng.wav */,
+				C891CA2E2D2D78E300E7E304 /* typerus.wav */,
+			);
+			path = sounds;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -208,6 +246,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C891CA302D2D78E300E7E304 /* replace.wav in Resources */,
+				C891CA312D2D78E300E7E304 /* typerus.wav in Resources */,
+				C891CA322D2D78E300E7E304 /* switch.wav in Resources */,
+				C891CA332D2D78E300E7E304 /* reverse.wav in Resources */,
+				C891CA342D2D78E300E7E304 /* typeeng.wav in Resources */,
+				C891CA352D2D78E300E7E304 /* en.wav in Resources */,
+				C891CA362D2D78E300E7E304 /* misprint.wav in Resources */,
+				C891CA372D2D78E300E7E304 /* ru.wav in Resources */,
 				4C79BED52A553F0E006A793C /* Preview Assets.xcassets in Resources */,
 				4C79BED22A553F0E006A793C /* Assets.xcassets in Resources */,
 			);
@@ -234,8 +280,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8EB5E062D2EDC7500FF7BEB /* PermissionsService.swift in Sources */,
 				4C79BED02A553F0D006A793C /* AppDelegate.swift in Sources */,
 				4C79BECE2A553F0D006A793C /* LangSwitchApp.swift in Sources */,
+				C8EB5E0B2D2EE2A600FF7BEB /* PermissionsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -393,7 +441,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"LangSwitch/Preview Content\"";
-				DEVELOPMENT_TEAM = X3Z75V6JU2;
+				DEVELOPMENT_TEAM = 38N58RYG9T;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -406,7 +454,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11;
 				MARKETING_VERSION = 1.3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.nikeev.LangSwitch;
+				PRODUCT_BUNDLE_IDENTIFIER = com.feelynn.LangSwitch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -424,7 +472,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"LangSwitch/Preview Content\"";
-				DEVELOPMENT_TEAM = X3Z75V6JU2;
+				DEVELOPMENT_TEAM = 38N58RYG9T;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -437,7 +485,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11;
 				MARKETING_VERSION = 1.3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.nikeev.LangSwitch;
+				PRODUCT_BUNDLE_IDENTIFIER = com.feelynn.LangSwitch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

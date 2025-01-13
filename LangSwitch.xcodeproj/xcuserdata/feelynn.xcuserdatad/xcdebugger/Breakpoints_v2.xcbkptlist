@@ -23,16 +23,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "827F9DCC-DA71-426E-B932-7FD1E0C3AC09"
+            uuid = "4B776C50-33C6-4121-AF62-E911442C3EE5"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LangSwitch/PermissionsService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "19"
-            endingLineNumber = "19"
-            landmarkName = "pollAccessibilityPrivileges()"
+            startingLineNumber = "31"
+            endingLineNumber = "31"
+            landmarkName = "acquireAccessibilityPrivileges()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

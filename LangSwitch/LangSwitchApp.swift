@@ -10,10 +10,15 @@ import SwiftUI
 @main
 struct LangSwitchApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-
+    @StateObject private var permissionsService = PermissionsService()
+    
     var body: some Scene {
         Settings {
-            EmptyView().frame(width:.zero)
+            if self.permissionsService.isTrusted {
+                EmptyView().frame(width:.zero)
+            } else {
+                PermissionsView()
+            }
         }
     }
 }
