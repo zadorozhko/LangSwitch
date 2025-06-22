@@ -1,8 +1,8 @@
 //
-//  ContentView.swift
+//  AppDelegate.swift
 //  LangSwitch
 //
-//  Created by ANTON NIKEEV on 05.07.2023.
+//  Created by Ilia Zadorozhko 2024.
 //
 
 import SwiftUI
@@ -10,18 +10,46 @@ import Carbon
 import Foundation
 import AppKit
 import AVFoundation
+import Accessibility
+
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusBarItem: NSStatusItem?
     var aboutWindow: NSWindow?
     var soundPlayer: AVAudioPlayer!
     var permissionsService: PermissionsService = PermissionsService()
-    var keyBuffer: String = "";
+    var currentLanguage = "en";
+    var shift: Bool = false;
+    var word: String;
+    var keyBuffer: [Int] = [];
+    var keyCodes = [12,13,14,15,17,16,32,34,31,35,33,30, /* qwertyuiop[] */
+                    0,1,2,3,5,4,38,40,37,41,39,42,       /* asdfghjkl;'\ */
+                    6,7,8,9,11,45,46,43,47];             /* zxcvbnm,.  56,60 - L/R Shift */
+    var keyen = "qwertyuiop[]asdfghjkl;'\\zxcvbnm,.";
+    var keyEN = "QWERTYUIOP[]ASDFGHJKL;'\\ZXCVBNM,. ";
+    var keyru = "йцукенгшщзхъфывапролджэёячсмитьбю/";
+    var keyRU = "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЁЯЧСМИТЬБЮ?";
     let longPressThreshold: TimeInterval = 0.2;
+    let GLOBE = 63;
+    let OPTION = 58;
+    let BACKSPACE = 51;
+    let SHIFT_LEFT :UInt16 = 56;
+    let SHIFT_RIGHT :UInt16 = 60;
+    let SPACE :UInt16 = 49;
+    let ENTER :UInt16 = 36;
+    
+    func simulateKeyPress(_ keyCode: Int) {
+        let src = CGEventSource(stateID: .hidSystemState)
+        let keyDownEvent = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(keyCode), keyDown: true)
+        let keyUpEvent = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(keyCode), keyDown: false)
+        
+        keyDownEvent?.post(tap: .cghidEventTap)
+        keyUpEvent?.post(tap: .cghidEventTap)
+    }
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Create a status bar item with a system icon
-        statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength + 1)
         statusBarItem?.button?.image = NSImage(systemSymbolName: "dollarsign", accessibilityDescription: nil)
         statusBarItem?.isVisible = true
         
@@ -42,12 +70,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         permissionsService.pollAccessibilityPrivileges()
        
         NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
-            print("keyCode: \(event.keyCode)")
+            if ([self.SPACE, self.ENTER].contains(event.keyCode)) { // Space, Enter
+                self.keyBuffer=[];
+            } else if(event.keyCode == self.BACKSPACE) { //Backspace
+                if (self.keyBuffer.count > 0){
+                    self.keyBuffer.removeLast();
+                    print("CL:\(self.currentLanguage) Code: \(event.keyCode) Buf:\(self.keyBuffer)");
+                }
+            } else {
+                if (self.keyCodes.contains(Int(event.keyCode))){
+                    self.keyBuffer.append(Int(event.keyCode));
+                    print("CL:\(self.currentLanguage) Code: \(event.keyCode) Buf:\(self.keyBuffer)");
+                }
+            }
         }
         
         // Register for Fn button press events
         NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { event in
-            if (event.keyCode == 63 && event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.function)) {
+            if (event.keyCode == self.GLOBE && event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.function)) {
                 anotherClicked = false;
                 lastPressTime = Date();
             }
@@ -56,7 +96,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 anotherClicked = true;
             }
 
-            if (event.keyCode == 63 &&
+            if (event.keyCode == self.GLOBE &&
                 !anotherClicked &&
                 event.modifierFlags.intersection(.deviceIndependentFlagsMask) == []) {
                 let timePassed = Date().timeIntervalSince(lastPressTime);
@@ -65,10 +105,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
             print("Fn keyCode: \(event.keyCode)")
-            if (event.keyCode == 58) { // Option key
+            if [self.SHIFT_LEFT, self.SHIFT_RIGHT].contains(event.keyCode) {
+                self.shift = true;
+            } else {
+                self.shift = false;
+            }
+          
+            if (event.keyCode == self.OPTION && event.modifierFlags.rawValue == 256) { // Option key down
+                //print(event.modifierFlags)
+                self.switchKeyboardLanguage();
                 self.playSound(soundToPlay: "switch")
+                for _ in self.keyBuffer { // remove old word
+                    self.simulateKeyPress(self.BACKSPACE) // 8 - backspace, 46 - delete ??? Real backspace code is 51
+                }
+                for key in self.keyBuffer { // and type another
+                    self.simulateKeyPress(key)
+                }
+                self.keyBuffer = []; //TODO: Dont clear buffer, reverse correction possible
             }
         }
+    }
+    
+    @objc func press(_ key: Int, withModifiers modifiers: CGEventFlags = .init()) {
+        let src = CGEventSource(stateID: .hidSystemState)
+        let down = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(key), keyDown: true)!
+        let up = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(key), keyDown: false)!
+        down.flags = modifiers
+        up.flags = modifiers
+        down.post(tap: .cghidEventTap)
+        up.post(tap: .cghidEventTap)
     }
     
     @objc func showPermissionWindow() {
@@ -212,9 +277,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let newSourceName = Unmanaged<CFString>.fromOpaque(TISGetInputSourceProperty(nextSource, kTISPropertyLocalizedName)).takeUnretainedValue() as String
         if (newSourceName == "ABC") {
             statusBarItem?.button?.image = NSImage(systemSymbolName: "dollarsign", accessibilityDescription: nil)
+            self.currentLanguage = "en";
             playSound(soundToPlay: "en")
         } else {
             statusBarItem?.button?.image = NSImage(systemSymbolName: "rublesign", accessibilityDescription: nil)
+            self.currentLanguage = "ru";
             playSound(soundToPlay: "ru")
         }
         
