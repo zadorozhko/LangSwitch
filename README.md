@@ -6,7 +6,7 @@ LangSwitch is a super-simple macOS app that switches your keyboard languages (in
 - App icon now display current input language
 - Sound on switching by Fn/🌐 
 - Sound on correction by ⌥/Option
-- Chec spelling and suggest corrections on right ⌥/Option
+- Check spelling and suggest corrections by right ⌥/Option
 - Sound on no suggestion available
 
 # In memory of Punto Switcher
