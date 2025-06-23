@@ -5,7 +5,9 @@ LangSwitch is a super-simple macOS app that switches your keyboard languages (in
 # Changes
 - App icon now display current input language
 - Sound on switching by Fn/🌐 
-- Sound on correction by ⌥/Option 
+- Sound on correction by ⌥/Option
+- Chec spelling and suggest corrections on right ⌥/Option
+- Sound on no suggestion available
 
 # In memory of Punto Switcher
 Purpose of this fork is to reborn a most needed app of all times. After it was acquired by Yandex, original developers flew to new project Caramba (which is paid now) and Punto was abandoned. It have Intel build only and work poor under Sequoia and Sonoma. Some ideas was inspired by Lang Switcher app from Ihor Prodan @DevelUA (good, but also paid). As far as I can tell there is no free solution for wrong language typing, so I was compelled to make one.
