@@ -20,6 +20,7 @@
 		C891CA352D2D78E300E7E304 /* en.wav in Resources */ = {isa = PBXBuildFile; fileRef = C891CA272D2D78E300E7E304 /* en.wav */; };
 		C891CA362D2D78E300E7E304 /* misprint.wav in Resources */ = {isa = PBXBuildFile; fileRef = C891CA282D2D78E300E7E304 /* misprint.wav */; };
 		C891CA372D2D78E300E7E304 /* ru.wav in Resources */ = {isa = PBXBuildFile; fileRef = C891CA2B2D2D78E300E7E304 /* ru.wav */; };
+		C8B1B7632E081A6500B285AA /* WordChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B1B7622E081A6500B285AA /* WordChecker.swift */; };
 		C8EB5E062D2EDC7500FF7BEB /* PermissionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EB5E052D2EDC7500FF7BEB /* PermissionsService.swift */; };
 		C8EB5E0B2D2EE2A600FF7BEB /* PermissionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EB5E0A2D2EE2A600FF7BEB /* PermissionsView.swift */; };
 /* End PBXBuildFile section */
@@ -59,6 +60,7 @@
 		C891CA2C2D2D78E300E7E304 /* switch.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = switch.wav; sourceTree = "<group>"; };
 		C891CA2D2D2D78E300E7E304 /* typeeng.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = typeeng.wav; sourceTree = "<group>"; };
 		C891CA2E2D2D78E300E7E304 /* typerus.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = typerus.wav; sourceTree = "<group>"; };
+		C8B1B7622E081A6500B285AA /* WordChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordChecker.swift; sourceTree = "<group>"; };
 		C8EB5E052D2EDC7500FF7BEB /* PermissionsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsService.swift; sourceTree = "<group>"; };
 		C8EB5E0A2D2EE2A600FF7BEB /* PermissionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -109,6 +111,7 @@
 		4C79BECC2A553F0D006A793C /* LangSwitch */ = {
 			isa = PBXGroup;
 			children = (
+				C8B1B7622E081A6500B285AA /* WordChecker.swift */,
 				C88261CB2D50F2D200A32C3A /* CGKeyCodeInitializers.swift */,
 				C8EB5E0A2D2EE2A600FF7BEB /* PermissionsView.swift */,
 				C8EB5E052D2EDC7500FF7BEB /* PermissionsService.swift */,
@@ -288,6 +291,7 @@
 				C88261CC2D50F2E200A32C3A /* CGKeyCodeInitializers.swift in Sources */,
 				4C79BECE2A553F0D006A793C /* LangSwitchApp.swift in Sources */,
 				C8EB5E0B2D2EE2A600FF7BEB /* PermissionsView.swift in Sources */,
+				C8B1B7632E081A6500B285AA /* WordChecker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

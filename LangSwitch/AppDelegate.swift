@@ -15,23 +15,27 @@ import Accessibility
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusBarItem: NSStatusItem?
+    var menu: NSMenu?
     var aboutWindow: NSWindow?
     var soundPlayer: AVAudioPlayer!
     var permissionsService: PermissionsService = PermissionsService()
+    let spellChecker = WordChecker(ignoredWords: Set<String>(), ignoredPatternsOfWords: [], ignoredPatternsOfFilesOrDirectories: [])
     var currentLanguage = "en";
+    var currentSource = "ABC";
     var shift: Bool = false;
-    var word: String;
+    var variants: [String]?;
     var keyBuffer: [Int] = [];
-    var keyCodes = [12,13,14,15,17,16,32,34,31,35,33,30, /* qwertyuiop[] */
+    let keyCodes = [12,13,14,15,17,16,32,34,31,35,33,30, /* qwertyuiop[] */
                     0,1,2,3,5,4,38,40,37,41,39,42,       /* asdfghjkl;'\ */
                     6,7,8,9,11,45,46,43,47];             /* zxcvbnm,.  56,60 - L/R Shift */
-    var keyen = "qwertyuiop[]asdfghjkl;'\\zxcvbnm,.";
-    var keyEN = "QWERTYUIOP[]ASDFGHJKL;'\\ZXCVBNM,. ";
+    let keyen = "qwertyuiop[]asdfghjkl;'\\zxcvbnm,.";
+    let keyEN = "QWERTYUIOP[]ASDFGHJKL;'\\ZXCVBNM,. ";
     var keyru = "йцукенгшщзхъфывапролджэёячсмитьбю/";
-    var keyRU = "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЁЯЧСМИТЬБЮ?";
+    let keyRU = "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЁЯЧСМИТЬБЮ?";
     let longPressThreshold: TimeInterval = 0.2;
     let GLOBE = 63;
-    let OPTION = 58;
+    let OPTION_LEFT = 58;
+    let OPTION_RIGHT = 61;
     let BACKSPACE = 51;
     let SHIFT_LEFT :UInt16 = 56;
     let SHIFT_RIGHT :UInt16 = 60;
@@ -45,6 +49,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         keyDownEvent?.post(tap: .cghidEventTap)
         keyUpEvent?.post(tap: .cghidEventTap)
+    }
+    
+    @objc func addException(word: String){
+        // TODO:
+    }
+    
+    @objc func variantChosen(_ sender: NSMenuItem){
+        let variant = sender.tag;
+        let word = self.variants?[variant];
+        print("VarCh: \(variant) Var: \(word)")
+        self.playSound(soundToPlay: "switch");
+        //self.simulateKeyPress(self.BACKSPACE); // remove space at end
+        for _ in self.keyBuffer { // remove old word
+            self.simulateKeyPress(self.BACKSPACE); // 8 - backspace, 46 - delete ??? Real backspace code is 51
+        }
+        for char in word ?? "" { // and type another
+            let key = self.getKeyCode(char: char)
+            print(key)
+            self.simulateKeyPress(key);
+        }
+        //self.simulateKeyPress(Int(self.SPACE)); // restore space at end
+        self.keyBuffer = [];
     }
     
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -63,16 +89,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         NSApp.setActivationPolicy(.accessory)
         NSApp.hide(nil)
-        
+
         var anotherClicked = false;
         var lastPressTime = Date();
-        
+ 
         permissionsService.pollAccessibilityPrivileges()
        
-        NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
-            if ([self.SPACE, self.ENTER].contains(event.keyCode)) { // Space, Enter
-                self.keyBuffer=[];
-            } else if(event.keyCode == self.BACKSPACE) { //Backspace
+        NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [self] event in
+            if([self.SPACE, self.ENTER].contains(event.keyCode)){
+                self.keyBuffer = [];
+            }
+            if(event.keyCode == self.BACKSPACE) { //Backspace
                 if (self.keyBuffer.count > 0){
                     self.keyBuffer.removeLast();
                     print("CL:\(self.currentLanguage) Code: \(event.keyCode) Buf:\(self.keyBuffer)");
@@ -86,16 +113,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         // Register for Fn button press events
-        NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { event in
+        NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { [self] event in
             if (event.keyCode == self.GLOBE && event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.function)) {
                 anotherClicked = false;
                 lastPressTime = Date();
             }
-            
             if (!event.modifierFlags.intersection([.shift, .control, .option, .command]).isEmpty) {
                 anotherClicked = true;
             }
-
             if (event.keyCode == self.GLOBE &&
                 !anotherClicked &&
                 event.modifierFlags.intersection(.deviceIndependentFlagsMask) == []) {
@@ -104,28 +129,91 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     self.switchKeyboardLanguage();
                 }
             }
-            print("Fn keyCode: \(event.keyCode)")
+            print("Fn keyCode: \(event.keyCode) mod: \(event.modifierFlags.rawValue)")
             if [self.SHIFT_LEFT, self.SHIFT_RIGHT].contains(event.keyCode) {
-                self.shift = true;
-            } else {
-                self.shift = false;
+                if(event.modifierFlags.rawValue != 256) {
+                    self.shift = true;
+                } else {
+                    self.shift = false;
+                }
             }
-          
-            if (event.keyCode == self.OPTION && event.modifierFlags.rawValue == 256) { // Option key down
+            if (event.keyCode == self.OPTION_LEFT && event.modifierFlags.rawValue == 256) { // Option key down
                 //print(event.modifierFlags)
                 self.switchKeyboardLanguage();
-                self.playSound(soundToPlay: "switch")
+                self.playSound(soundToPlay: "switch");
                 for _ in self.keyBuffer { // remove old word
-                    self.simulateKeyPress(self.BACKSPACE) // 8 - backspace, 46 - delete ??? Real backspace code is 51
+                    self.simulateKeyPress(self.BACKSPACE); // 8 - backspace, 46 - delete ??? Real backspace code is 51
                 }
                 for key in self.keyBuffer { // and type another
-                    self.simulateKeyPress(key)
+                    self.simulateKeyPress(key);
                 }
                 self.keyBuffer = []; //TODO: Dont clear buffer, reverse correction possible
+            }
+            if ((self.OPTION_RIGHT == event.keyCode) && (event.modifierFlags.rawValue == 256)) {
+                // check spelling here
+                let spelling = self.spellChecker.checkAndSuggestCorrections(word: self.getLastWord(),languages:Set<String>( arrayLiteral: self.currentLanguage))
+                print(spelling);
+                self.variants = spelling[self.getLastWord()];
+                if(self.variants != nil){
+                    print("Corrections: \(self.variants ?? ["###"])")
+                    //TODO: Display context menu with suggestions
+                    let corrMenu = NSMenu();
+                    corrMenu.addItem(withTitle: "Add exception", action: #selector(addException), keyEquivalent: "");
+                    var variant_idx = 0
+                    for suggestion in (self.variants ?? []) {
+                        let menuItem = NSMenuItem(title: suggestion, action: #selector(variantChosen(_:)), keyEquivalent: "");
+                        menuItem.tag = variant_idx;
+                        corrMenu.addItem(menuItem);
+                        variant_idx += 1;
+                    }
+                    if (variant_idx != 0) {
+                        self.playSound(soundToPlay: "misprint");
+                        self.statusBarItem?.popUpMenu(corrMenu);
+                    } else {
+                        self.playSound(soundToPlay: "misprint");
+                    }
+                }
+                //self.keyBuffer=[]; // <--- WRONG !!! we still need it for suggestions
             }
         }
     }
     
+    func getKeyCodes(word: String) -> [Int] {
+        var codes:[Int] = [];
+        for char in word {
+            let pos = getKeyCode(char: char)
+            if (pos == -1) { continue }
+            codes.append(keyCodes[pos]);
+        }
+        return codes;
+    }
+    
+    func getKeyCode(char:Character) -> Int {
+        var pos = self.keyen.distance(of: char)
+        if (pos == nil) { pos = self.keyru.distance(of: char) }
+        if (pos == nil) { pos = self.keyEN.distance(of: char) }
+        if (pos == nil) { pos = self.keyRU.distance(of: char) };
+        return keyCodes[pos ?? -1];
+    }
+    
+    func getLastWord() -> String {
+        var str:String = "";
+        for code in self.keyBuffer {
+            let pos = self.keyCodes.firstIndex(of: code)
+            if (self.currentLanguage == "en" && !self.shift) {
+                str.append(keyen[pos!]);
+            } else if (self.currentLanguage == "en" && self.shift) {
+                str.append(keyEN[pos!]);
+            } else if (self.currentLanguage == "ru" && !self.shift) {
+                str.append(keyru[pos!]);
+            } else if (self.currentLanguage == "ru" && self.shift) {
+                str.append(keyRU[pos!]);
+            }
+            //print("\(pos ?? -1):\(code) = \(str)")
+        }
+        print("S:\(self.shift) last:\(str)")
+        return str;
+    }
     @objc func press(_ key: Int, withModifiers modifiers: CGEventFlags = .init()) {
         let src = CGEventSource(stateID: .hidSystemState)
         let down = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(key), keyDown: true)!
@@ -141,8 +229,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let myDict: CFDictionary = NSDictionary(dictionary: [promptFlag: true])
         AXIsProcessTrustedWithOptions(myDict)
 
-        if (AXIsProcessTrustedWithOptions(myDict))
-        {
+        if (AXIsProcessTrustedWithOptions(myDict)) {
             print("AD: Access Granted")
         } else {
             print("AD: Access NOT Granted")
@@ -284,7 +371,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.currentLanguage = "ru";
             playSound(soundToPlay: "ru")
         }
-        
+        self.currentSource = newSourceName;
         print("Switched to: \(newSourceName)")
     }
     
@@ -306,6 +393,37 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
+extension String {
+    var length: Int {
+        return count
+    }
+    subscript (i: Int) -> String {
+        return self[i ..< i + 1]
+    }
+    func substring(fromIndex: Int) -> String {
+        return self[min(fromIndex, length) ..< length]
+    }
+    func substring(toIndex: Int) -> String {
+        return self[0 ..< max(0, toIndex)]
+    }
+    subscript (r: Range<Int>) -> String {
+        let range = Range(uncheckedBounds: (lower: max(0, min(length, r.lowerBound)),
+                                            upper: min(length, max(0, r.upperBound))))
+        let start = index(startIndex, offsetBy: range.lowerBound)
+        let end = index(start, offsetBy: range.upperBound - range.lowerBound)
+        return String(self[start ..< end])
+    }
+}
+extension StringProtocol {
+    func distance(of element: Element) -> Int? { firstIndex(of: element)?.distance(in: self) }
+    func distance<S: StringProtocol>(of string: S) -> Int? { range(of: string)?.lowerBound.distance(in: self) }
+}
+extension Collection {
+    func distance(to index: Index) -> Int { distance(from: startIndex, to: index) }
+}
+extension String.Index {
+    func distance<S: StringProtocol>(in string: S) -> Int { string.distance(to: self) }
+}
 extension TISInputSource {
     enum Category {
         static var keyboardInputSource: String {
