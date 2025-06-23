@@ -167,11 +167,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         variant_idx += 1;
                     }
                     if (variant_idx != 0) {
-                        self.playSound(soundToPlay: "misprint");
                         self.statusBarItem?.popUpMenu(corrMenu);
-                    } else {
-                        self.playSound(soundToPlay: "misprint");
                     }
+                } else {
+                    self.playSound(soundToPlay: "misprint");
                 }
                 //self.keyBuffer=[]; // <--- WRONG !!! we still need it for suggestions
             }
