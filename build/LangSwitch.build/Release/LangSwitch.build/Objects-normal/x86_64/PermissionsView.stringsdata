@@ -1,0 +1,48 @@
+{
+  "source": "/Users/feelynn/Work/LangSwitch/LangSwitch/PermissionsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Permissions Required 🔐",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 19
+        }
+      },
+      {
+        "comment": "",
+        "key": "macOS requires that this app has accessibility permissions granted to it in order to press the specified keys or buttons.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 23
+        }
+      },
+      {
+        "comment": "",
+        "key": "You should have already been prompted by macOS to grant these permissions but if not, here's a handy button to get you there:",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 28
+        }
+      },
+      {
+        "comment": "",
+        "key": "The app will automatically unlock within a few seconds of the permission being granted.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 36
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open System Preferences",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 33
+        }
+      }
+    ]
+  },
+  "version": 1
+}

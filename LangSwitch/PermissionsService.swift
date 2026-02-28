@@ -36,7 +36,7 @@ final class PermissionsService: ObservableObject {
         } else {
             self.isTrusted = false
             print("PS: Access Not Enabled")
-            PermissionsView()
+            let _ = PermissionsView()
         }
     }
 }

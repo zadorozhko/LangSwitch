@@ -1,0 +1,51 @@
+{
+  "" : {
+    "const-values" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitch-primary.swiftconstvalues",
+    "dependencies" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitch-primary.d",
+    "diagnostics" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitch-primary.dia",
+    "emit-module-dependencies" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitch-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitch-primary-emit-module.dia",
+    "pch" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitch-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitch-primary.swiftdeps"
+  },
+  "/Users/feelynn/Work/LangSwitch/LangSwitch/AppDelegate.swift" : {
+    "index-unit-output-path" : "/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/AppDelegate.o",
+    "llvm-bc" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/AppDelegate.bc",
+    "object" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/AppDelegate.o"
+  },
+  "/Users/feelynn/Work/LangSwitch/LangSwitch/CGKeyCodeInitializers.swift" : {
+    "index-unit-output-path" : "/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/CGKeyCodeInitializers.o",
+    "llvm-bc" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/CGKeyCodeInitializers.bc",
+    "object" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/CGKeyCodeInitializers.o"
+  },
+  "/Users/feelynn/Work/LangSwitch/LangSwitch/ContextProvider.swift" : {
+    "index-unit-output-path" : "/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/ContextProvider.o",
+    "llvm-bc" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/ContextProvider.bc",
+    "object" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/ContextProvider.o"
+  },
+  "/Users/feelynn/Work/LangSwitch/LangSwitch/LangSwitchApp.swift" : {
+    "index-unit-output-path" : "/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitchApp.o",
+    "llvm-bc" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitchApp.bc",
+    "object" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitchApp.o"
+  },
+  "/Users/feelynn/Work/LangSwitch/LangSwitch/PermissionsService.swift" : {
+    "index-unit-output-path" : "/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/PermissionsService.o",
+    "llvm-bc" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/PermissionsService.bc",
+    "object" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/PermissionsService.o"
+  },
+  "/Users/feelynn/Work/LangSwitch/LangSwitch/PermissionsView.swift" : {
+    "index-unit-output-path" : "/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/PermissionsView.o",
+    "llvm-bc" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/PermissionsView.bc",
+    "object" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/PermissionsView.o"
+  },
+  "/Users/feelynn/Work/LangSwitch/LangSwitch/WordChecker.swift" : {
+    "index-unit-output-path" : "/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/WordChecker.o",
+    "llvm-bc" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/WordChecker.bc",
+    "object" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/WordChecker.o"
+  },
+  "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  }
+}

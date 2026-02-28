@@ -1,0 +1,12 @@
+{
+  "/Users/feelynn/Work/LangSwitch/LangSwitch/PermissionsService.swift" : {
+    "abi-baseline-json" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitch.abi.json",
+    "const-values" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitch-primary.swiftconstvalues",
+    "dependencies" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitch-primary.d",
+    "diagnostics" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitch-primary.dia",
+    "objc-header" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitch-Swift.h",
+    "swiftdoc" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitch.swiftdoc",
+    "swiftmodule" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitch.swiftmodule",
+    "swiftsourceinfo" : "/Users/feelynn/Work/LangSwitch/build/LangSwitch.build/Release/LangSwitch.build/Objects-normal/arm64/LangSwitch.swiftsourceinfo"
+  }
+}

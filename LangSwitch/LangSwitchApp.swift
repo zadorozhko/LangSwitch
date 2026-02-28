@@ -17,7 +17,7 @@ struct LangSwitchApp: App {
             if self.permissionsService.isTrusted {
                 EmptyView().frame(width:.zero)
             } else {
-                PermissionsView()
+                let _ = PermissionsView()
             }
         }
     }

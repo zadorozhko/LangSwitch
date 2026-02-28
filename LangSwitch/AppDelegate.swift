@@ -20,11 +20,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var soundPlayer: AVAudioPlayer!
     var permissionsService: PermissionsService = PermissionsService()
     let spellChecker = WordChecker(ignoredWords: Set<String>(), ignoredPatternsOfWords: [], ignoredPatternsOfFilesOrDirectories: [])
+    private var observationTokens: [NSKeyValueObservation] = []
+    var contextProvider: ContextProvider = ContextProvider();
     var currentLanguage = "en";
     var currentSource = "ABC";
     var shift: Bool = false;
     var variants: [String]?;
-    var keyBuffer: [Int] = [];
+    //var keyBuffer: [Int] = [];
     let keyCodes = [12,13,14,15,17,16,32,34,31,35,33,30, /* qwertyuiop[] */
                     0,1,2,3,5,4,38,40,37,41,39,42,       /* asdfghjkl;'\ */
                     6,7,8,9,11,45,46,43,47];             /* zxcvbnm,.  56,60 - L/R Shift */
@@ -46,31 +48,52 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let src = CGEventSource(stateID: .hidSystemState)
         let keyDownEvent = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(keyCode), keyDown: true)
         let keyUpEvent = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(keyCode), keyDown: false)
-        
         keyDownEvent?.post(tap: .cghidEventTap)
         keyUpEvent?.post(tap: .cghidEventTap)
+    }
+    
+    func shiftKey(_ pressed: Bool) {
+        let src = CGEventSource(stateID: .hidSystemState)
+        let keyEvent = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(self.SHIFT_LEFT), keyDown: pressed)
+        keyEvent?.post(tap: .cghidEventTap)
     }
     
     @objc func addException(word: String){
         // TODO:
     }
     
+    // Deprecated
     @objc func variantChosen(_ sender: NSMenuItem){
         let variant = sender.tag;
         let word = self.variants?[variant];
-        print("VarCh: \(variant) Var: \(word)")
+        print("VarCh: \(variant) Var: \(word ?? "###")")
         self.playSound(soundToPlay: "switch");
-        //self.simulateKeyPress(self.BACKSPACE); // remove space at end
-        for _ in self.keyBuffer { // remove old word
+//        for _ in self.keyBuffer { // remove old word
             self.simulateKeyPress(self.BACKSPACE); // 8 - backspace, 46 - delete ??? Real backspace code is 51
-        }
+ //       }
         for char in word ?? "" { // and type another
-            let key = self.getKeyCode(char: char)
-            print(key)
-            self.simulateKeyPress(key);
+            let (key, shift) = self.getKeyCode(char: char)
+            //print(key)
+            if(shift){
+                //self.shiftKey(true);
+                self.simulateKeyPress(key);
+                //self.shiftKey(false);
+            } else {
+                self.simulateKeyPress(key);
+            }
         }
         //self.simulateKeyPress(Int(self.SPACE)); // restore space at end
-        self.keyBuffer = [];
+        //self.keyBuffer.removeAll();
+    }
+    
+    func frontmostApplicationDidChange(context:NSRunningApplication) {
+        //print("CL:\(self.currentLanguage) SH:\(self.shift) CTX:\(self.contextProvider.currentContext)")
+        //for app in self.contextProvider.scancodes {
+        //  print(app)
+        //}
+        //print("From \(self.contextProvider.currentContext ?? "±")");
+        print("Ctx: \(NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? "none")");
+        self.contextProvider.switchContext(ctx:NSWorkspace.shared.frontmostApplication!, currLang: self.currentLanguage);
     }
     
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -89,6 +112,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         NSApp.setActivationPolicy(.accessory)
         NSApp.hide(nil)
+        
+        let token = NSWorkspace.shared.observe(\.frontmostApplication, options: [.initial, .new]) { [weak self] _, _ in
+            self?.frontmostApplicationDidChange(context: NSWorkspace.shared.frontmostApplication!)
+                }
+                observationTokens.append(token)
 
         var anotherClicked = false;
         var lastPressTime = Date();
@@ -96,23 +124,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         permissionsService.pollAccessibilityPrivileges()
        
         NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [self] event in
+            let code = Int(event.keyCode); //v.2
             if([self.SPACE, self.ENTER].contains(event.keyCode)){
-                self.keyBuffer = [];
+                self.contextProvider.push(code:code);
+                self.contextProvider.markDirty(); //v2
+                self.checkSpeling();
             }
-            if(event.keyCode == self.BACKSPACE) { //Backspace
-                if (self.keyBuffer.count > 0){
-                    self.keyBuffer.removeLast();
-                    print("CL:\(self.currentLanguage) Code: \(event.keyCode) Buf:\(self.keyBuffer)");
-                }
+            if(event.keyCode == self.BACKSPACE) { //Backspace v.1
+                self.contextProvider.backspace(); //v.2
             } else {
                 if (self.keyCodes.contains(Int(event.keyCode))){
-                    self.keyBuffer.append(Int(event.keyCode));
-                    print("CL:\(self.currentLanguage) Code: \(event.keyCode) Buf:\(self.keyBuffer)");
+                    self.contextProvider.push(code:code);
                 }
             }
         }
+        // Register for mouse buttons
+        NSEvent.addGlobalMonitorForEvents(matching: .otherMouseDown) { [self] event in
+            print("Mouse %d down", event.buttonNumber)
+        }
         
-        // Register for Fn button press events
+        // Register for Fn button press events 
         NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { [self] event in
             if (event.keyCode == self.GLOBE && event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.function)) {
                 anotherClicked = false;
@@ -129,75 +160,103 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     self.switchKeyboardLanguage();
                 }
             }
-            print("Fn keyCode: \(event.keyCode) mod: \(event.modifierFlags.rawValue)")
+            //print("Fn keyCode: \(event.keyCode) mod: \(event.modifierFlags.rawValue)")
             if [self.SHIFT_LEFT, self.SHIFT_RIGHT].contains(event.keyCode) {
                 if(event.modifierFlags.rawValue != 256) {
                     self.shift = true;
                 } else {
                     self.shift = false;
                 }
+                print("Shift:\(self.shift)");
             }
             if (event.keyCode == self.OPTION_LEFT && event.modifierFlags.rawValue == 256) { // Option key down
                 //print(event.modifierFlags)
                 self.switchKeyboardLanguage();
                 self.playSound(soundToPlay: "switch");
-                for _ in self.keyBuffer { // remove old word
-                    self.simulateKeyPress(self.BACKSPACE); // 8 - backspace, 46 - delete ??? Real backspace code is 51
-                }
-                for key in self.keyBuffer { // and type another
-                    self.simulateKeyPress(key);
-                }
-                self.keyBuffer = []; //TODO: Dont clear buffer, reverse correction possible
+                removeOld();
+                typeNew();
             }
             if ((self.OPTION_RIGHT == event.keyCode) && (event.modifierFlags.rawValue == 256)) {
-                // check spelling here
-                let spelling = self.spellChecker.checkAndSuggestCorrections(word: self.getLastWord(),languages:Set<String>( arrayLiteral: self.currentLanguage))
-                print(spelling);
-                self.variants = spelling[self.getLastWord()];
-                if(self.variants != nil){
-                    print("Corrections: \(self.variants ?? ["###"])")
-                    //TODO: Display context menu with suggestions
-                    let corrMenu = NSMenu();
-                    corrMenu.addItem(withTitle: "Add exception", action: #selector(addException), keyEquivalent: "");
-                    var variant_idx = 0
-                    for suggestion in (self.variants ?? []) {
-                        let menuItem = NSMenuItem(title: suggestion, action: #selector(variantChosen(_:)), keyEquivalent: "");
-                        menuItem.tag = variant_idx;
-                        corrMenu.addItem(menuItem);
-                        variant_idx += 1;
-                    }
-                    if (variant_idx != 0) {
-                        self.statusBarItem?.popUpMenu(corrMenu);
-                    }
-                } else {
-                    self.playSound(soundToPlay: "misprint");
-                }
-                //self.keyBuffer=[]; // <--- WRONG !!! we still need it for suggestions
+                checkSpeling();
+                //print("CL:\(self.currentLanguage) SH:\(self.shift) CTX:\(self.contextProvider.currentContext)")
+                //for app in self.contextProvider.scancodes {
+                //  print(app)
+                //}
             }
+        }
+    }
+    
+    func typeNew(){
+        for key in self.contextProvider.pull() { // and type another
+            self.simulateKeyPress(key);
+        }
+    }
+    
+    func removeOld(){
+        if(0 == self.contextProvider.count()) {return;}
+        for _ in 1...self.contextProvider.count() { // remove old word
+            self.simulateKeyPress(self.BACKSPACE); // 8 - backspace, 46 - delete ??? Real backspace code is 51
+        }
+    }
+    
+    func checkSpeling(){
+        // check spelling here закурим закурим пакурим пкурим
+        let lastWord = self.getLastWord();
+        let spelling = self.spellChecker.checkAndSuggestCorrections(word: lastWord,languages:Set<String>( arrayLiteral: self.currentLanguage))
+        print(spelling);
+        self.variants = spelling[lastWord];
+        if(self.variants != nil){
+            let sugg_count = self.variants?.count;
+            if (sugg_count == 1 && self.variants?.first != lastWord){ // The only variant, autofix
+                print("AF:\(self.variants?.first)");
+                
+            }
+  /* Menu grabs focus - need to invent context menu
+            print("Corrections: \(self.variants ?? ["###"])")
+            let corrMenu = NSMenu();
+            //corrMenu.addItem(withTitle: "Add exception", action: #selector(addException), keyEquivalent: "");
+            var variant_idx = 0
+            for suggestion in (self.variants ?? []) {
+                let menuItem = NSMenuItem(title: suggestion, action: #selector(variantChosen(_:)), keyEquivalent: "");
+                menuItem.tag = variant_idx;
+                corrMenu.addItem(menuItem);
+                variant_idx += 1;
+            }
+            if (variant_idx != 0) {
+                //self.statusBarItem?.popUpMenu(corrMenu);
+            }
+   */
+            self.playSound(soundToPlay: "misprint");
         }
     }
     
     func getKeyCodes(word: String) -> [Int] {
         var codes:[Int] = [];
         for char in word {
-            let pos = getKeyCode(char: char)
+            let (pos,shift) = getKeyCode(char: char)
             if (pos == -1) { continue }
-            codes.append(keyCodes[pos]);
+            var code = keyCodes[pos];
+            if(shift){ code |= 0x1000}
+            codes.append(code);
         }
         return codes;
     }
     
-    func getKeyCode(char:Character) -> Int {
+    func getKeyCode(char:Character) -> (Int, Bool) {
         var pos = self.keyen.distance(of: char)
+        var shift = false;
         if (pos == nil) { pos = self.keyru.distance(of: char) }
-        if (pos == nil) { pos = self.keyEN.distance(of: char) }
-        if (pos == nil) { pos = self.keyRU.distance(of: char) };
-        return keyCodes[pos ?? -1];
+        if (pos == nil) { pos = self.keyEN.distance(of: char); shift=true }
+        if (pos == nil) { pos = self.keyRU.distance(of: char); shift=true };
+        return (keyCodes[pos ?? -1], shift);
     }
     
-    func getLastWord() -> String {
+    func getLastWord() -> String { // This convert FROM keycodes to currentLanguage давай закурим
         var str:String = "";
-        for code in self.keyBuffer {
+        for code in self.contextProvider.pull() {
+            if(code == self.SPACE || code == self.ENTER) {
+                return str;
+            }
             let pos = self.keyCodes.firstIndex(of: code)
             if (self.currentLanguage == "en" && !self.shift) {
                 str.append(keyen[pos!]);
@@ -213,6 +272,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         print("S:\(self.shift) last:\(str)")
         return str;
     }
+    
     @objc func press(_ key: Int, withModifiers modifiers: CGEventFlags = .init()) {
         let src = CGEventSource(stateID: .hidSystemState)
         let down = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(key), keyDown: true)!
@@ -242,8 +302,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             
             let windowContent = NSView(frame: NSRect(x: 0, y: 0, width: windowWidth, height: windowHeight))
             let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown version"
-
-            let versionLabel = NSTextField(labelWithString: "LangSwitch v\(version)")
+            let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "bug"
+            let versionLabel = NSTextField(labelWithString: "LangSwitch v\(version)-\(build)")
             versionLabel.frame = NSRect(x: (windowWidth - 150) / 2, y: 130, width: 150, height: 20)
             versionLabel.alignment = .center // Центрирование текста
             windowContent.addSubview(versionLabel)

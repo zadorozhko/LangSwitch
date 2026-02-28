@@ -11,6 +11,7 @@
 		4C79BED02A553F0D006A793C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C79BECF2A553F0D006A793C /* AppDelegate.swift */; };
 		4C79BED22A553F0E006A793C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C79BED12A553F0E006A793C /* Assets.xcassets */; };
 		4C79BED52A553F0E006A793C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C79BED42A553F0E006A793C /* Preview Assets.xcassets */; };
+		C830D6182E265473006C91C7 /* ContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C830D6172E26545D006C91C7 /* ContextProvider.swift */; };
 		C88261CC2D50F2E200A32C3A /* CGKeyCodeInitializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88261CB2D50F2D200A32C3A /* CGKeyCodeInitializers.swift */; };
 		C891CA302D2D78E300E7E304 /* replace.wav in Resources */ = {isa = PBXBuildFile; fileRef = C891CA292D2D78E300E7E304 /* replace.wav */; };
 		C891CA312D2D78E300E7E304 /* typerus.wav in Resources */ = {isa = PBXBuildFile; fileRef = C891CA2E2D2D78E300E7E304 /* typerus.wav */; };
@@ -51,6 +52,7 @@
 		4C79BED62A553F0E006A793C /* LangSwitch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LangSwitch.entitlements; sourceTree = "<group>"; };
 		4C79BEDB2A553F0E006A793C /* LangSwitchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LangSwitchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C79BEE52A553F0E006A793C /* LangSwitchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LangSwitchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C830D6172E26545D006C91C7 /* ContextProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextProvider.swift; sourceTree = "<group>"; };
 		C88261CB2D50F2D200A32C3A /* CGKeyCodeInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGKeyCodeInitializers.swift; sourceTree = "<group>"; };
 		C891CA272D2D78E300E7E304 /* en.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = en.wav; path = LangSwitch/sounds/en.wav; sourceTree = SOURCE_ROOT; };
 		C891CA282D2D78E300E7E304 /* misprint.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = misprint.wav; sourceTree = "<group>"; };
@@ -111,6 +113,7 @@
 		4C79BECC2A553F0D006A793C /* LangSwitch */ = {
 			isa = PBXGroup;
 			children = (
+				C830D6172E26545D006C91C7 /* ContextProvider.swift */,
 				C8B1B7622E081A6500B285AA /* WordChecker.swift */,
 				C88261CB2D50F2D200A32C3A /* CGKeyCodeInitializers.swift */,
 				C8EB5E0A2D2EE2A600FF7BEB /* PermissionsView.swift */,
@@ -291,6 +294,7 @@
 				C88261CC2D50F2E200A32C3A /* CGKeyCodeInitializers.swift in Sources */,
 				4C79BECE2A553F0D006A793C /* LangSwitchApp.swift in Sources */,
 				C8EB5E0B2D2EE2A600FF7BEB /* PermissionsView.swift in Sources */,
+				C830D6182E265473006C91C7 /* ContextProvider.swift in Sources */,
 				C8B1B7632E081A6500B285AA /* WordChecker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
