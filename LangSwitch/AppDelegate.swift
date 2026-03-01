@@ -89,11 +89,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func frontmostApplicationDidChange(context:NSRunningApplication) {
         //print("CL:\(self.currentLanguage) SH:\(self.shift) CTX:\(self.contextProvider.currentContext)")
         //for app in self.contextProvider.scancodes {
-        //  print(app)
+        //  print(app) йц
         //}
         //print("From \(self.contextProvider.currentContext ?? "±")");
-        print("Ctx: \(NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? "none")");
         self.contextProvider.switchContext(ctx:NSWorkspace.shared.frontmostApplication!, currLang: self.currentLanguage);
+        print("\(self.contextProvider.pull()) \(NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? "none")");
     }
     
     func applicationDidFinishLaunching(_ notification: Notification) {

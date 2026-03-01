@@ -10,24 +10,39 @@ internal class ContextProvider {
     var ctxLang:[String:String] = [:];
     var dirty:[String:Bool] = [:];
     var scancodes:[String:[Int]] = [:]; /* ["app1"] => [5,7,10,4], ["app2"] => [] */
+    // For debug only - this logic is in AppDelegate
+    let keyCodes = [12,13,14,15,17,16,32,34,31,35,33,30, /* qwertyuiop[] */
+                    0,1,2,3,5,4,38,40,37,41,39,42,       /* asdfghjkl;'\ */
+                    6,7,8,9,11,45,46,43,47];             /* zxcvbnm,.  56,60 - L/R Shift */
+    let keyen = "qwertyuiop[]asdfghjkl;'\\zxcvbnm,./±"; //Last char is a placeholder for "notfund"
     
+    func debugPrint(){
+        print("\(self.pull()) \(self.pullStr()) \(currentContext ?? "no_ctx")")
+    }
+    func pullStr() -> String {
+        var str:String = "";
+        for c in self.pull() {
+            str.append(keyen[keyCodes.firstIndex(of: c) ?? 36])
+        }
+        return str;
+    }
     func push(code:Int){
         if isDirty() {
             flush();
             self.dirty[self.currentContext!] = false;
         }
         appendValue(forKey: currentContext ?? "none", value: code);
-        print("\(self.pull()) \(currentContext ?? "no")")
+        self.debugPrint()
     }
     func pull() -> [Int] {
-        if let codes = scancodes[self.currentContext!] {
+        if let codes = scancodes[self.currentContext ?? "none"] {
             return codes;
         } else {
             return [];
         }
     }
     func count() -> Int {
-        if let codes = scancodes[self.currentContext!] {
+        if let codes = scancodes[self.currentContext ?? "none"] {
             return codes.count;
         } else {
             return 0;
@@ -57,6 +72,7 @@ internal class ContextProvider {
                 scancodes[self.currentContext!] = existingValues
             }
         } // else context not exists !!!
+        self.debugPrint()
     }
     
     func flush(){
