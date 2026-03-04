@@ -16,48 +16,32 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var menu: NSMenu?
     var aboutWindow: NSWindow?
     let soundManager = SoundManager()
+    let keyboardManager = KeyboardManager()
     var permissionsService: PermissionsService = PermissionsService()
     let spellChecker = WordChecker(ignoredWords: Set<String>(), ignoredPatternsOfWords: [], ignoredPatternsOfFilesOrDirectories: [])
     private var observationTokens: [NSKeyValueObservation] = []
     var contextProvider: ContextProvider = ContextProvider();
-    var currentLanguage = "en";
-    var currentSource = "ABC";
     var shift: Bool = false;
     var variants: [String]?;
-    //var keyBuffer: [Int] = [];
-    let keyCodes = [12,13,14,15,17,16,32,34,31,35,33,30, /* qwertyuiop[] */
-                    0,1,2,3,5,4,38,40,37,41,39,42,       /* asdfghjkl;'\ */
-                    6,7,8,9,11,45,46,43,47];             /* zxcvbnm,.  56,60 - L/R Shift */
-    let keyen = "qwertyuiop[]asdfghjkl;'\\zxcvbnm,./";
-    let keyEN = "QWERTYUIOP[]ASDFGHJKL;'\\ZXCVBNM,.?";
-    var keyru = "йцукенгшщзхъфывапролджэёячсмитьбю/";
-    let keyRU = "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЁЯЧСМИТЬБЮ?";
-    let longPressThreshold: TimeInterval = 0.2;
-    let GLOBE = 63;
-    let OPTION_LEFT = 58;
-    let OPTION_RIGHT = 61;
-    let BACKSPACE = 51;
-    let SHIFT_LEFT :UInt16 = 56;
-    let SHIFT_RIGHT :UInt16 = 60;
-    let SPACE :UInt16 = 49;
-    let ENTER :UInt16 = 36;
     
-    func simulateKeyPress(_ keyCode: Int) {
-        var key:Int = keyCode, shift:Bool = false
-        if key > 128 {
-            shift =  true
-            key -= 128
-        }
-        let src = CGEventSource(stateID: .hidSystemState)
-        let keyDownEvent = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(key), keyDown: true)
-        let keyUpEvent = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(key), keyDown: false)
-        let shiftDownEvent = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(self.SHIFT_LEFT), keyDown: true)
-        let shiftUpEvent = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(self.SHIFT_LEFT), keyDown: false)
-        
-        if (shift) { shiftDownEvent?.post(tap: .cghidEventTap) }
-        keyDownEvent?.post(tap: .cghidEventTap)
-        keyUpEvent?.post(tap: .cghidEventTap)
-        if (shift) { shiftUpEvent?.post(tap: .cghidEventTap) }
+    private var keyCodes: [Int] { keyboardManager.keyCodes }
+    private var BACKSPACE: Int { Int(keyboardManager.BACKSPACE) }
+    private var SPACE: Int { Int(keyboardManager.SPACE) }
+    private var ENTER: Int { Int(keyboardManager.ENTER) }
+    private var GLOBE: UInt16 { keyboardManager.GLOBE }
+    private var OPTION_LEFT: UInt16 { keyboardManager.OPTION_LEFT }
+    private var OPTION_RIGHT: UInt16 { keyboardManager.OPTION_RIGHT }
+    private var SHIFT_LEFT: UInt16 { keyboardManager.SHIFT_LEFT }
+    private var SHIFT_RIGHT: UInt16 { keyboardManager.SHIFT_RIGHT }
+    private var longPressThreshold: TimeInterval { keyboardManager.longPressThreshold }
+    
+    var currentLanguage: String {
+        get { keyboardManager.currentLanguage }
+        set { }
+    }
+    
+    private func simulateKeyPress(_ keyCode: Int) {
+        keyboardManager.simulateKeyPress(keyCode)
     }
     
     func shiftKey(_ pressed: Bool) {
@@ -136,13 +120,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         permissionsService.pollAccessibilityPrivileges()
        
         NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [self] event in
-            let code = Int(event.keyCode); //v.2
-            if([self.SPACE].contains(event.keyCode)){
+            let code = Int(event.keyCode);
+            if event.keyCode == keyboardManager.SPACE {
                 self.contextProvider.push(code:code, shift:self.shift);
                 self.contextProvider.markDirty(); //v2
                 self.checkSpeling();
             }
-            if(event.keyCode == self.BACKSPACE) { //Backspace v.1
+            if event.keyCode == keyboardManager.BACKSPACE {
                 self.contextProvider.backspace(); //v.2
             } else {
                 if (self.keyCodes.contains(Int(event.keyCode))){
@@ -254,47 +238,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func getKeyCode(char:Character) -> (Int, Bool) {
-        var pos = self.keyen.distance(of: char)
-        var shift = false;
-        if (pos == nil) { pos = self.keyru.distance(of: char) }
-        if (pos == nil) { pos = self.keyEN.distance(of: char); shift=true }
-        if (pos == nil) { pos = self.keyRU.distance(of: char); shift=true };
-        return (keyCodes[pos ?? -1], shift);
+        return keyboardManager.getKeyCode(for: char)
     }
     
-    func getLastWord() -> String { // This convert FROM keycodes to currentLanguage
-        var str:String = "";
-        var shift:Bool = false;
-        var key:Int
-        for code in self.contextProvider.pull() {
-            if(code == self.SPACE || code == self.ENTER) {
-                return str;
-            }
-            if (code>128){
-                shift = true
-                key = code - 128
-            } else {
-                shift = false
-                key = code
-            }
-            let pos = self.keyCodes.firstIndex(of: key)
-            if(pos != nil){
-                if (self.currentLanguage == "en" && !shift) {
-                    str.append(keyen[pos!]);
-                } else if (self.currentLanguage == "en" && shift) {
-                    str.append(keyEN[pos!]);
-                } else if (self.currentLanguage == "ru" && !shift) {
-                    str.append(keyru[pos!]);
-                } else if (self.currentLanguage == "ru" && shift) {
-                    str.append(keyRU[pos!]);
-                }
-                print("\(pos ?? -1):\(code) = \(str)")
-            } else {
-                print("getLastWord: Keycode \(key) not found")
-            }
-        }
-       // print("S:\(self.shift) last:\(str)")
-        return str;
+    func getLastWord() -> String {
+        return keyboardManager.getLastWord(from: contextProvider.pull())
     }
     
     @objc func press(_ key: Int, withModifiers modifiers: CGEventFlags = .init()) {
@@ -402,120 +350,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func switchKeyboardLanguage() {
-        // Get the current keyboard input source
-        guard let currentSource = TISCopyCurrentKeyboardInputSource()?.takeUnretainedValue() else {
-            print("Failed to get current keyboard language.")
-            return
+        keyboardManager.onLanguageChanged = { [weak self] (newSourceName: String) in
+            guard let self = self else { return }
+            if newSourceName == "ABC" {
+                self.statusBarItem?.button?.image = NSImage(systemSymbolName: "dollarsign", accessibilityDescription: nil)
+                self.soundManager.play(soundName: "en")
+            } else {
+                self.statusBarItem?.button?.image = NSImage(systemSymbolName: "rublesign", accessibilityDescription: nil)
+                self.soundManager.play(soundName: "ru")
+            }
         }
-        
-        // Get all enabled keyboard input sources
-        guard let inputSources = getInputSources() as? [TISInputSource],
-              !inputSources.isEmpty else {
-            print("Failed to get keyboard languages.")
-            return
-        }
-        
-        // Find the index of the current input source
-        guard let currentIndex = inputSources.firstIndex(where: { $0 == currentSource }) else {
-            print("Failed to switch keyboard language.")
-            return
-        }
-        
-        // Calculate the index of the next input source
-        let nextIndex = (currentIndex + 1) % inputSources.count
-        
-        // Retrieve the next input source
-        let nextSource = inputSources[nextIndex]
-        
-        // Switch to the next input source
-        TISSelectInputSource(nextSource)
-        
-        // Print the new input source's name
-        let newSourceName = Unmanaged<CFString>.fromOpaque(TISGetInputSourceProperty(nextSource, kTISPropertyLocalizedName)).takeUnretainedValue() as String
-        if (newSourceName == "ABC") {
-            statusBarItem?.button?.image = NSImage(systemSymbolName: "dollarsign", accessibilityDescription: nil)
-            self.currentLanguage = "en";
-            soundManager.play(soundName: "en")
-        } else {
-            statusBarItem?.button?.image = NSImage(systemSymbolName: "rublesign", accessibilityDescription: nil)
-            self.currentLanguage = "ru";
-            soundManager.play(soundName: "ru")
-        }
-        self.currentSource = newSourceName;
-        print("Switched to: \(newSourceName)")
-    }
-    
-    func getInputSources() -> [TISInputSource] {
-        let inputSourceNSArray = TISCreateInputSourceList(nil, false)
-            .takeRetainedValue() as NSArray
-        var inputSourceList = inputSourceNSArray as! [TISInputSource]
-        
-        inputSourceList = inputSourceList.filter({
-            $0.category == TISInputSource.Category.keyboardInputSource
-        })
-        
-        let inputSources = inputSourceList.filter(
-            {
-                $0.isSelectable
-            })
-        
-        return inputSources
-    }
-}
-
-extension String {
-    var length: Int {
-        return count
-    }
-    subscript (i: Int) -> String {
-        return self[i ..< i + 1]
-    }
-    func substring(fromIndex: Int) -> String {
-        return self[min(fromIndex, length) ..< length]
-    }
-    func substring(toIndex: Int) -> String {
-        return self[0 ..< max(0, toIndex)]
-    }
-    subscript (r: Range<Int>) -> String {
-        let range = Range(uncheckedBounds: (lower: max(0, min(length, r.lowerBound)),
-                                            upper: min(length, max(0, r.upperBound))))
-        let start = index(startIndex, offsetBy: range.lowerBound)
-        let end = index(start, offsetBy: range.upperBound - range.lowerBound)
-        return String(self[start ..< end])
-    }
-}
-extension StringProtocol {
-    func distance(of element: Element) -> Int? { firstIndex(of: element)?.distance(in: self) }
-    func distance<S: StringProtocol>(of string: S) -> Int? { range(of: string)?.lowerBound.distance(in: self) }
-}
-extension Collection {
-    func distance(to index: Index) -> Int { distance(from: startIndex, to: index) }
-}
-extension String.Index {
-    func distance<S: StringProtocol>(in string: S) -> Int { string.distance(to: self) }
-}
-extension TISInputSource {
-    enum Category {
-        static var keyboardInputSource: String {
-            return kTISCategoryKeyboardInputSource as String
-        }
-    }
-    
-    private func getProperty(_ key: CFString) -> AnyObject? {
-        let cfType = TISGetInputSourceProperty(self, key)
-        if (cfType != nil) {
-            return Unmanaged<AnyObject>.fromOpaque(cfType!)
-                .takeUnretainedValue()
-        } else {
-            return nil
-        }
-    }
-    
-    var category: String {
-        return getProperty(kTISPropertyInputSourceCategory) as! String
-    }
-    
-    var isSelectable: Bool {
-        return getProperty(kTISPropertyInputSourceIsSelectCapable) as! Bool
+        keyboardManager.switchLanguage()
     }
 }

@@ -2,7 +2,7 @@
 //  SoundManager.swift
 //  LangSwitch
 //
-//  Created by OpenCode Zen :: Big Pickle
+//  Created by OpenCode Zen :: Big Pickle 2
 //
 
 import AVFoundation
