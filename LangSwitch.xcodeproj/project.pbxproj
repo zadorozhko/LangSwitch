@@ -13,6 +13,8 @@
 		4C79BED52A553F0E006A793C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C79BED42A553F0E006A793C /* Preview Assets.xcassets */; };
 		C812F5362F584CDE004EAD3E /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C812F5352F584CDE004EAD3E /* SoundManager.swift */; };
 		C812F53A2F585793004EAD3E /* KeyboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C812F5392F585793004EAD3E /* KeyboardManager.swift */; };
+		C812F53C2F58631B004EAD3E /* EventMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C812F53B2F58631B004EAD3E /* EventMonitor.swift */; };
+		C812F53E2F586342004EAD3E /* AboutWindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C812F53D2F586342004EAD3E /* AboutWindowManager.swift */; };
 		C830D6182E265473006C91C7 /* ContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C830D6172E26545D006C91C7 /* ContextProvider.swift */; };
 		C88261CC2D50F2E200A32C3A /* CGKeyCodeInitializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88261CB2D50F2D200A32C3A /* CGKeyCodeInitializers.swift */; };
 		C891CA302D2D78E300E7E304 /* replace.wav in Resources */ = {isa = PBXBuildFile; fileRef = C891CA292D2D78E300E7E304 /* replace.wav */; };
@@ -56,6 +58,8 @@
 		4C79BEE52A553F0E006A793C /* LangSwitchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LangSwitchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C812F5352F584CDE004EAD3E /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 		C812F5392F585793004EAD3E /* KeyboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardManager.swift; sourceTree = "<group>"; };
+		C812F53B2F58631B004EAD3E /* EventMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMonitor.swift; sourceTree = "<group>"; };
+		C812F53D2F586342004EAD3E /* AboutWindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutWindowManager.swift; sourceTree = "<group>"; };
 		C830D6172E26545D006C91C7 /* ContextProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextProvider.swift; sourceTree = "<group>"; };
 		C88261CB2D50F2D200A32C3A /* CGKeyCodeInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGKeyCodeInitializers.swift; sourceTree = "<group>"; };
 		C891CA272D2D78E300E7E304 /* en.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = en.wav; path = LangSwitch/sounds/en.wav; sourceTree = SOURCE_ROOT; };
@@ -117,6 +121,8 @@
 		4C79BECC2A553F0D006A793C /* LangSwitch */ = {
 			isa = PBXGroup;
 			children = (
+				C812F53D2F586342004EAD3E /* AboutWindowManager.swift */,
+				C812F53B2F58631B004EAD3E /* EventMonitor.swift */,
 				C812F5392F585793004EAD3E /* KeyboardManager.swift */,
 				C830D6172E26545D006C91C7 /* ContextProvider.swift */,
 				C8B1B7622E081A6500B285AA /* WordChecker.swift */,
@@ -296,9 +302,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8EB5E062D2EDC7500FF7BEB /* PermissionsService.swift in Sources */,
+				C812F53C2F58631B004EAD3E /* EventMonitor.swift in Sources */,
 				C812F5362F584CDE004EAD3E /* SoundManager.swift in Sources */,
 				4C79BED02A553F0D006A793C /* AppDelegate.swift in Sources */,
 				C88261CC2D50F2E200A32C3A /* CGKeyCodeInitializers.swift in Sources */,
+				C812F53E2F586342004EAD3E /* AboutWindowManager.swift in Sources */,
 				4C79BECE2A553F0D006A793C /* LangSwitchApp.swift in Sources */,
 				C8EB5E0B2D2EE2A600FF7BEB /* PermissionsView.swift in Sources */,
 				C830D6182E265473006C91C7 /* ContextProvider.swift in Sources */,

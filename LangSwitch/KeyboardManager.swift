@@ -2,53 +2,23 @@
 //  KeyboardManager.swift
 //  LangSwitch
 //
-//  Created by ANTON NIKEEV on 05.07.2023.
+//  Created by OpenCode Zen :: Big Pickle 2026
 //
 
 import AppKit
 import Carbon
 
-extension Collection {
-    func distance(to index: Index) -> Int { distance(from: startIndex, to: index) }
-}
-
-extension String.Index {
-    func distance<S: StringProtocol>(in string: S) -> Int { string.distance(to: self) }
-}
-
 extension StringProtocol {
-    func distance(of element: Element) -> Int? { firstIndex(of: element)?.distance(in: self) }
-    func distance<S: StringProtocol>(of string: S) -> Int? { range(of: string)?.lowerBound.distance(in: self) }
-/*    func distance(of element: Element) -> Int? {
+    func distance(of element: Element) -> Int? {
         guard let idx = firstIndex(of: element) else { return nil }
         return self.distance(from: startIndex, to: idx)
     }
- */
 }
 
 extension String {
-    /*subscript(i: Int) -> String {
+    subscript(i: Int) -> String {
         let idx = self.index(self.startIndex, offsetBy: i)
         return String(self[idx])
-    }*/
-    var length: Int {
-        return count
-    }
-    subscript (i: Int) -> String {
-        return self[i ..< i + 1]
-    }
-    func substring(fromIndex: Int) -> String {
-        return self[min(fromIndex, length) ..< length]
-    }
-    func substring(toIndex: Int) -> String {
-        return self[0 ..< max(0, toIndex)]
-    }
-    subscript (r: Range<Int>) -> String {
-        let range = Range(uncheckedBounds: (lower: max(0, min(length, r.lowerBound)),
-                                            upper: min(length, max(0, r.upperBound))))
-        let start = index(startIndex, offsetBy: range.lowerBound)
-        let end = index(start, offsetBy: range.upperBound - range.lowerBound)
-        return String(self[start ..< end])
     }
 }
 
@@ -226,29 +196,6 @@ final class KeyboardManager {
         self.isShiftPressed = isPressed
     }
 }
-
-/*extension TISInputSource {
-    enum Category {
-        static var keyboardInputSource: String {
-            return kTISCategoryKeyboardInputSource as String
-        }
-    }
-    
-    private func getProperty(_ key: CFString) -> AnyObject? {
-        guard let cfType = TISGetInputSourceProperty(self, key) else {
-            return nil
-        }
-        return Unmanaged<AnyObject>.fromOpaque(cfType).takeUnretainedValue()
-    }
-    
-    var category: String {
-        return getProperty(kTISPropertyInputSourceCategory) as! String
-    }
-    
-    var isSelectable: Bool {
-        return getProperty(kTISPropertyInputSourceIsSelectCapable) as! Bool
-    }
-}*/
 
 extension TISInputSource {
     enum Category {

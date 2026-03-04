@@ -32,7 +32,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "195"
             endingLineNumber = "195"
-            landmarkName = "removeOld()"
+            landmarkName = "exitAction()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -64,7 +64,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "105"
             endingLineNumber = "105"
-            landmarkName = "applicationDidFinishLaunching(_:)"
+            landmarkName = "switchKeyboardLanguage()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -79,9 +79,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "219"
-            endingLineNumber = "219"
-            landmarkName = "checkSpeling()"
-            landmarkType = "7">
+            endingLineNumber = "219">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -96,7 +94,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "80"
             endingLineNumber = "80"
-            landmarkName = "variantChosen(_:)"
+            landmarkName = "setupEventMonitor()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -112,7 +110,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "88"
             endingLineNumber = "88"
-            landmarkName = "frontmostApplicationDidChange(context:)"
+            landmarkName = "setupEventMonitor()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -128,7 +126,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "149"
             endingLineNumber = "149"
-            landmarkName = "applicationDidFinishLaunching(_:)"
+            landmarkName = "checkSpelling()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
