@@ -17,7 +17,8 @@ final class EventMonitor {
     
     private let keyboardManager: KeyboardManager
     private let contextProvider: ContextProvider
-    private var onSpaceOrEnter: (() -> Void)?
+    private var onSpace: (() -> Void)?
+    private var onEnter: (() -> Void)?
     private var onBackspace: (() -> Void)?
     private var onKeyCode: ((Int) -> Void)?
     private var onGlobeKey: ((NSEvent.ModifierFlags) -> Void)?
@@ -34,7 +35,8 @@ final class EventMonitor {
     }
     
     func start(
-        onSpaceOrEnter: @escaping () -> Void,
+        onSpace: @escaping () -> Void,
+        onEnter: @escaping () -> Void,
         onBackspace: @escaping () -> Void,
         onKeyCode: @escaping (Int) -> Void,
         onGlobeKey: @escaping (NSEvent.ModifierFlags) -> Void,
@@ -42,7 +44,8 @@ final class EventMonitor {
         onOptionRight: @escaping () -> Void,
         onShiftChange: @escaping (Bool) -> Void
     ) {
-        self.onSpaceOrEnter = onSpaceOrEnter
+        self.onSpace = onSpace
+        self.onEnter = onEnter
         self.onBackspace = onBackspace
         self.onKeyCode = onKeyCode
         self.onGlobeKey = onGlobeKey
@@ -84,7 +87,14 @@ final class EventMonitor {
         if event.keyCode == keyboardManager.SPACE {
             contextProvider.push(code: code, shift: keyboardManager.isShiftPressed)
             contextProvider.markDirty()
-            onSpaceOrEnter?()
+            onSpace?()
+            return
+        }
+        
+        if event.keyCode == keyboardManager.ENTER {
+            // clear buffer
+            contextProvider.flush()
+            onEnter?()
             return
         }
         

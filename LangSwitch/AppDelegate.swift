@@ -66,8 +66,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         eventMonitor = EventMonitor(keyboardManager: keyboardManager, contextProvider: contextProvider)
         
         eventMonitor?.start(
-            onSpaceOrEnter: { [weak self] in
+            onSpace: { [weak self] in
                 self?.checkSpelling()
+            },
+            onEnter: { [weak self] in
+                self?.contextProvider.flush()
             },
             onBackspace: { [weak self] in
             },
@@ -160,7 +163,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         for char in word {
-            let (key, needsShift) = keyboardManager.getKeyCode(for: char)
+            let (key, _) = keyboardManager.getKeyCode(for: char)
             if key != -1 {
                 keyboardManager.simulateKeyPress(key)
             }

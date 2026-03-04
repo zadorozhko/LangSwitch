@@ -133,7 +133,7 @@ final class KeyboardManager {
         var result = ""
         
         for code in keyCodes {
-            if code == SPACE || code == ENTER {
+            if code == SPACE {
                 return result
             }
             
