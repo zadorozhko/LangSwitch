@@ -9,15 +9,13 @@ import SwiftUI
 import Carbon
 import Foundation
 import AppKit
-import AVFoundation
 import Accessibility
-
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusBarItem: NSStatusItem?
     var menu: NSMenu?
     var aboutWindow: NSWindow?
-    var soundPlayer: AVAudioPlayer!
+    let soundManager = SoundManager()
     var permissionsService: PermissionsService = PermissionsService()
     let spellChecker = WordChecker(ignoredWords: Set<String>(), ignoredPatternsOfWords: [], ignoredPatternsOfFilesOrDirectories: [])
     private var observationTokens: [NSKeyValueObservation] = []
@@ -30,8 +28,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let keyCodes = [12,13,14,15,17,16,32,34,31,35,33,30, /* qwertyuiop[] */
                     0,1,2,3,5,4,38,40,37,41,39,42,       /* asdfghjkl;'\ */
                     6,7,8,9,11,45,46,43,47];             /* zxcvbnm,.  56,60 - L/R Shift */
-    let keyen = "qwertyuiop[]asdfghjkl;'\\zxcvbnm,.";
-    let keyEN = "QWERTYUIOP[]ASDFGHJKL;'\\ZXCVBNM,. ";
+    let keyen = "qwertyuiop[]asdfghjkl;'\\zxcvbnm,./";
+    let keyEN = "QWERTYUIOP[]ASDFGHJKL;'\\ZXCVBNM,.?";
     var keyru = "йцукенгшщзхъфывапролджэёячсмитьбю/";
     let keyRU = "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЁЯЧСМИТЬБЮ?";
     let longPressThreshold: TimeInterval = 0.2;
@@ -45,11 +43,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let ENTER :UInt16 = 36;
     
     func simulateKeyPress(_ keyCode: Int) {
+        var key:Int = keyCode, shift:Bool = false
+        if key > 128 {
+            shift =  true
+            key -= 128
+        }
         let src = CGEventSource(stateID: .hidSystemState)
-        let keyDownEvent = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(keyCode), keyDown: true)
-        let keyUpEvent = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(keyCode), keyDown: false)
+        let keyDownEvent = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(key), keyDown: true)
+        let keyUpEvent = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(key), keyDown: false)
+        let shiftDownEvent = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(self.SHIFT_LEFT), keyDown: true)
+        let shiftUpEvent = CGEvent(keyboardEventSource: src, virtualKey: CGKeyCode(self.SHIFT_LEFT), keyDown: false)
+        
+        if (shift) { shiftDownEvent?.post(tap: .cghidEventTap) }
         keyDownEvent?.post(tap: .cghidEventTap)
         keyUpEvent?.post(tap: .cghidEventTap)
+        if (shift) { shiftUpEvent?.post(tap: .cghidEventTap) }
     }
     
     func shiftKey(_ pressed: Bool) {
@@ -67,23 +75,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let variant = sender.tag;
         let word = self.variants?[variant];
         print("VarCh: \(variant) Var: \(word ?? "###")")
-        self.playSound(soundToPlay: "switch");
-//        for _ in self.keyBuffer { // remove old word
+        self.soundManager.play(soundName: "switch");
+        for _ in 0..<contextProvider.count() { // remove old word
             self.simulateKeyPress(self.BACKSPACE); // 8 - backspace, 46 - delete ??? Real backspace code is 51
- //       }
+        }
         for char in word ?? "" { // and type another
             let (key, shift) = self.getKeyCode(char: char)
             //print(key)
             if(shift){
                 //self.shiftKey(true);
+                print("S\(key)")
                 self.simulateKeyPress(key);
                 //self.shiftKey(false);
             } else {
                 self.simulateKeyPress(key);
             }
         }
-        //self.simulateKeyPress(Int(self.SPACE)); // restore space at end
-        //self.keyBuffer.removeAll();
+        contextProvider.flush()
+        self.simulateKeyPress(Int(self.SPACE)); // restore space at end
     }
     
     func frontmostApplicationDidChange(context:NSRunningApplication) {
@@ -97,6 +106,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Set activation policy to .accessory to keep the app in the background
+        // but still allow it to show menus and non-activating panels/windows.
+        NSApplication.shared.setActivationPolicy(.accessory)
         // Create a status bar item with a system icon
         statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength + 1)
         statusBarItem?.button?.image = NSImage(systemSymbolName: "dollarsign", accessibilityDescription: nil)
@@ -125,8 +137,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
        
         NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [self] event in
             let code = Int(event.keyCode); //v.2
-            if([self.SPACE, self.ENTER].contains(event.keyCode)){
-                self.contextProvider.push(code:code);
+            if([self.SPACE].contains(event.keyCode)){
+                self.contextProvider.push(code:code, shift:self.shift);
                 self.contextProvider.markDirty(); //v2
                 self.checkSpeling();
             }
@@ -134,14 +146,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self.contextProvider.backspace(); //v.2
             } else {
                 if (self.keyCodes.contains(Int(event.keyCode))){
-                    self.contextProvider.push(code:code);
+                    self.contextProvider.push(code:code, shift:self.shift);
                 }
             }
         }
         // Register for mouse buttons
-        NSEvent.addGlobalMonitorForEvents(matching: .otherMouseDown) { [self] event in
-            print("Mouse %d down", event.buttonNumber)
-        }
+        //NSEvent.addGlobalMonitorForEvents(matching: .otherMouseDown) { [self] event in
+        //    print("Mouse %d down", event.buttonNumber)
+        //}
         
         // Register for Fn button press events 
         NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { [self] event in
@@ -172,7 +184,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if (event.keyCode == self.OPTION_LEFT && event.modifierFlags.rawValue == 256) { // Option key down
                 //print(event.modifierFlags)
                 self.switchKeyboardLanguage();
-                self.playSound(soundToPlay: "switch");
+                self.soundManager.play(soundName: "switch");
                 removeOld();
                 typeNew();
             }
@@ -211,8 +223,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 print("AF:\(self.variants?.first)");
                 
             }
-  /* Menu grabs focus - need to invent context menu
-            print("Corrections: \(self.variants ?? ["###"])")
+  /* Menu grabs focus - need to invent context menu */
+            //print("Corrections: \(self.variants ?? ["###"])")
+            self.soundManager.play(soundName: "misprint");
             let corrMenu = NSMenu();
             //corrMenu.addItem(withTitle: "Add exception", action: #selector(addException), keyEquivalent: "");
             var variant_idx = 0
@@ -223,10 +236,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 variant_idx += 1;
             }
             if (variant_idx != 0) {
-                //self.statusBarItem?.popUpMenu(corrMenu);
+                self.statusBarItem?.popUpMenu(corrMenu);
             }
-   */
-            self.playSound(soundToPlay: "misprint");
         }
     }
     
@@ -251,25 +262,38 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return (keyCodes[pos ?? -1], shift);
     }
     
-    func getLastWord() -> String { // This convert FROM keycodes to currentLanguage давай закурим
+    func getLastWord() -> String { // This convert FROM keycodes to currentLanguage
         var str:String = "";
+        var shift:Bool = false;
+        var key:Int
         for code in self.contextProvider.pull() {
             if(code == self.SPACE || code == self.ENTER) {
                 return str;
             }
-            let pos = self.keyCodes.firstIndex(of: code)
-            if (self.currentLanguage == "en" && !self.shift) {
-                str.append(keyen[pos!]);
-            } else if (self.currentLanguage == "en" && self.shift) {
-                str.append(keyEN[pos!]);
-            } else if (self.currentLanguage == "ru" && !self.shift) {
-                str.append(keyru[pos!]);
-            } else if (self.currentLanguage == "ru" && self.shift) {
-                str.append(keyRU[pos!]);
+            if (code>128){
+                shift = true
+                key = code - 128
+            } else {
+                shift = false
+                key = code
             }
-            //print("\(pos ?? -1):\(code) = \(str)")
+            let pos = self.keyCodes.firstIndex(of: key)
+            if(pos != nil){
+                if (self.currentLanguage == "en" && !shift) {
+                    str.append(keyen[pos!]);
+                } else if (self.currentLanguage == "en" && shift) {
+                    str.append(keyEN[pos!]);
+                } else if (self.currentLanguage == "ru" && !shift) {
+                    str.append(keyru[pos!]);
+                } else if (self.currentLanguage == "ru" && shift) {
+                    str.append(keyRU[pos!]);
+                }
+                print("\(pos ?? -1):\(code) = \(str)")
+            } else {
+                print("getLastWord: Keycode \(key) not found")
+            }
         }
-        print("S:\(self.shift) last:\(str)")
+       // print("S:\(self.shift) last:\(str)")
         return str;
     }
     
@@ -377,19 +401,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApplication.shared.terminate(nil)
     }
     
-    func playSound(soundToPlay: String) {
-        let url = Bundle.main.url(forResource: soundToPlay, withExtension: "wav")
-        if (url) != nil {
-            do {
-                soundPlayer = try! AVAudioPlayer(contentsOf: url!)
-                soundPlayer.volume = 1.0
-                soundPlayer.play()
-            }
-        } else {
-            print("Error: Sound \(soundToPlay) not found")
-        }
-    }
-    
     func switchKeyboardLanguage() {
         // Get the current keyboard input source
         guard let currentSource = TISCopyCurrentKeyboardInputSource()?.takeUnretainedValue() else {
@@ -424,11 +435,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if (newSourceName == "ABC") {
             statusBarItem?.button?.image = NSImage(systemSymbolName: "dollarsign", accessibilityDescription: nil)
             self.currentLanguage = "en";
-            playSound(soundToPlay: "en")
+            soundManager.play(soundName: "en")
         } else {
             statusBarItem?.button?.image = NSImage(systemSymbolName: "rublesign", accessibilityDescription: nil)
             self.currentLanguage = "ru";
-            playSound(soundToPlay: "ru")
+            soundManager.play(soundName: "ru")
         }
         self.currentSource = newSourceName;
         print("Switched to: \(newSourceName)")

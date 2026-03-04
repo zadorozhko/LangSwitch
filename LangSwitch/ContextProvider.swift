@@ -14,7 +14,7 @@ internal class ContextProvider {
     let keyCodes = [12,13,14,15,17,16,32,34,31,35,33,30, /* qwertyuiop[] */
                     0,1,2,3,5,4,38,40,37,41,39,42,       /* asdfghjkl;'\ */
                     6,7,8,9,11,45,46,43,47];             /* zxcvbnm,.  56,60 - L/R Shift */
-    let keyen = "qwertyuiop[]asdfghjkl;'\\zxcvbnm,./±"; //Last char is a placeholder for "notfund"
+    let keyen = "qwertyuiop[]asdfghjkl;'\\zxcvbnm,./±"; //Last char is a placeholder for "notfound"
     
     func debugPrint(){
         print("\(self.pull()) \(self.pullStr()) \(currentContext ?? "no_ctx")")
@@ -26,12 +26,13 @@ internal class ContextProvider {
         }
         return str;
     }
-    func push(code:Int){
+    func push(code:Int, shift:Bool){
         if isDirty() {
             flush();
             self.dirty[self.currentContext!] = false;
         }
-        appendValue(forKey: currentContext ?? "none", value: code);
+        let scode = shift ? (code + 128) : code;
+        appendValue(forKey: currentContext ?? "none", value: scode);
         self.debugPrint()
     }
     func pull() -> [Int] {
