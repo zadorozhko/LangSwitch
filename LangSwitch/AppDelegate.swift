@@ -9,6 +9,7 @@ import SwiftUI
 import AppKit
 import Accessibility
 
+@available(macOS 12.0, *)
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusBarItem: NSStatusItem?
     private let soundManager = SoundManager()
@@ -62,6 +63,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         permissionsService.pollAccessibilityPrivileges()
     }
     
+    // Play! ⚽️ ??
     private func setupEventMonitor() {
         eventMonitor = EventMonitor(keyboardManager: keyboardManager, contextProvider: contextProvider)
         

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(macOS 12.0, *)
 @main
 struct LangSwitchApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate

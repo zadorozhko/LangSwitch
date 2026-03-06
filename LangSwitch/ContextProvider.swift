@@ -2,10 +2,10 @@
 //  ContextProvider.swift
 //  LangSwitch
 //
-//  Created by Zadorozhko Ilia on 15.07.2025.
+//  Created by I.Zadorozhko on 15.07.2025.
 //
 import AppKit
-internal class ContextProvider {
+internal final class ContextProvider {
     var currentContext:String? = "";
     var ctxLang:[String:String] = [:];
     var dirty:[String:Bool] = [:];

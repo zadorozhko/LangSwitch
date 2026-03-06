@@ -8,23 +8,34 @@
 import AppKit
 import SwiftUI
 
+@available(macOS 12.0, *)
 final class AboutWindowManager {
     private var window: NSWindow?
     
     func show() {
-        if window == nil {
+        if window == nil { //TODO: On second call to About it fails here with EXC_BAD_ACCESS
             createWindow()
         }
         window?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
     
+    var compileDate:Date
+    {
+        let bundleName = Bundle.main.infoDictionary!["CFBundleName"] as? String ?? "Info.plist"
+        if let infoPath = Bundle.main.path(forResource: bundleName, ofType: nil),
+           let infoAttr = try? FileManager.default.attributesOfItem(atPath: infoPath),
+           let infoDate = infoAttr[FileAttributeKey.creationDate] as? Date
+        { return infoDate }
+        return Date()
+    }
+    
     private func createWindow() {
-        let windowWidth: CGFloat = 300
+        let windowWidth: CGFloat = 460
         let windowHeight: CGFloat = 180
         
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
-        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "bug"
+        let build = compileDate.formatted()
         
         let aboutView = AboutView(
             version: version,
