@@ -139,11 +139,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             guard let self = self else { return }
             if newSourceName == "ABC" {
                 //self.statusBarItem?.button?.image = NSImage(systemSymbolName: "dollarsign", accessibilityDescription: nil)
-                self.statusBarItem?.button?.title = "🇺🇸"
+                self.statusBarItem?.button?.title = keyboardManager.flag(code: "en") // 🇺🇸
                 self.soundManager.play(soundName: "en")
             } else {
                 //self.statusBarItem?.button?.image = NSImage(systemSymbolName: "rublesign", accessibilityDescription: nil)
-                self.statusBarItem?.button?.title = "🇷🇺"
+                self.statusBarItem?.button?.title = keyboardManager.flag(code: "ru") // 🇷🇺
                 self.soundManager.play(soundName: "ru")
             }
         }

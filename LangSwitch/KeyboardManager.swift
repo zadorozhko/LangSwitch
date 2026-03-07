@@ -62,36 +62,26 @@ final class KeyboardManager {
     private(set) var currentLanguage: String = "en"
     private(set) var currentSource: String = "ABC"
     private(set) var isShiftPressed: Bool = false    
-    private(set) var flags: [[String]] = [
-        ["English","en","🇺🇸"],
-        ["German", "de","🇩🇪"],
-        ["French", "fr","🇫🇷"],
-        ["Spanish","es","🇪🇸"],
-        ["Italian","it","🇮🇹"],
-        ["Portuguese","pt","🇵🇹"],
-        ["Dutch","nl","🇳🇱"],
-        ["Polish","pl","🇵🇱"],
-        ["Russian","ru","🇷🇺"],
-        ["Ukrainian","uk","🇺🇦"],
-        ["Czech","cs","🇨🇿"],
-        ["Romanian","ro","🇷🇴"],
-        ["Hungarian","hu","🇭🇺"],
-        ["Swedish","sv","🇸🇪"],
-        ["Danish","da","🇩🇰"],
-        ["Finnish","fi","🇫🇮"],
-        ["Norwegian","no","🇳🇴"],
-        ["Greek","el","🇬🇷"],
-        ["Bulgarian","bg","🇧🇬"],
-        ["Slovak","sk","🇸🇰"],
-        ["Croatian","hr","🇭🇷"],
-        ["Serbian","sr","🇷🇸"],
-        ["Turkish","tr","🇹🇷"],
+    private let flags: [[String]] = [
+        ["English","en","🇺🇸"],["Русский","ru","🇷🇺"],["Deutsch", "de","🇩🇪"],["Français", "fr","🇫🇷"],["Español","es","🇪🇸"],
+        ["Italiano","it","🇮🇹"],["Portuguese","pt","🇵🇹"],["Nederlands","nl","🇳🇱"],["Polski","pl","🇵🇱"],["Українська","uk","🇺🇦"],
+        ["Čeština","cs","🇨🇿"],["Română","ro","🇷🇴"],["Magyar","hu","🇭🇺"],["Svenska","sv","🇸🇪"],["Dansk","da","🇩🇰"],
+        ["Suomi","fi","🇫🇮"],["Norsk","no","🇳🇴"],["Ελληνικά","el","🇬🇷"],["Български","bg","🇧🇬"],
+        ["Slovenčina","sk","🇸🇰"],["Hrvatski","hr","🇭🇷"],["Српски","sr","🇷🇸"],["Türkçe","tr","🇹🇷"],
     ]
     
     var onLanguageChanged: ((String) -> Void)?
     
-    func flag(for code: String) -> String? {
-        return "🇹🇷"
+    func flag(code: String) -> String {
+        if let rowIndex = flags.firstIndex(where: { innerArray in
+            return innerArray.count > 1 && innerArray[1] == code
+        }) {
+            print("Flag index: \(rowIndex)")
+            return flags[rowIndex][2]
+        } else {
+            print("No flag found for '\(code)'")
+            return "$"
+        }
     }
     
     func simulateKeyPress(_ keyCode: Int) {
