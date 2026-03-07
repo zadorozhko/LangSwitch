@@ -8,6 +8,7 @@
 import SwiftUI
 import AppKit
 import Accessibility
+import ServiceManagement
 
 @available(macOS 12.0, *)
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -29,17 +30,41 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationDidFinishLaunching(_ notification: Notification) {
+        launchAtLogin()
         setupStatusBar()
         setupObservers()
         setupPermissions()
         setupEventMonitor()
     }
     
+    @objc func launchAtLogin() {
+        if #available(macOS 13.0, *) {
+            do {
+                if SMAppService.mainApp.status == .enabled {
+                    // do nothing
+                    print("Login item already registered.")
+                } else {
+                    try SMAppService.mainApp.register()
+                }
+            } catch {
+                print("Failed to enable login item: \(error)")
+            }
+        } else {
+            // Fallback on earlier versions
+            print("Login item functionality is not available on this version of macOS.")
+        }
+    }
+
+    
     private func setupStatusBar() {
         NSApplication.shared.setActivationPolicy(.accessory)
         
         statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength + 1)
-        statusBarItem?.button?.image = NSImage(systemSymbolName: "dollarsign", accessibilityDescription: nil)
+        //statusBarItem?.button?.image = NSImage(systemSymbolName: "dollarsign", accessibilityDescription: nil)
+        let fontSize: CGFloat = 21.0 // Flag icon size
+        self.statusBarItem?.button?.frame = CGRectMake(0.0, -8.0, 10.0, 8.0)
+        self.statusBarItem?.button?.font = NSFont.systemFont(ofSize: fontSize)
+        self.statusBarItem?.button?.title = "🇺🇸"
         statusBarItem?.isVisible = true
         
         let menu = NSMenu()
@@ -48,7 +73,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(withTitle: "Request permissions", action: #selector(showPermissionWindow), keyEquivalent: "")
         menu.addItem(withTitle: "Exit", action: #selector(exitAction), keyEquivalent: "")
         statusBarItem?.menu = menu
-        
+        // hide menu bar if the button was pressed once
+         let userDefaults = UserDefaults.standard
+         if userDefaults.bool(forKey: "hideStatusBarIcon") {
+             statusBarItem?.isVisible = false
+         }
+        NSApp.setActivationPolicy(.accessory)
         NSApp.hide(nil)
     }
     
@@ -108,10 +138,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         keyboardManager.onLanguageChanged = { [weak self] (newSourceName: String) in
             guard let self = self else { return }
             if newSourceName == "ABC" {
-                self.statusBarItem?.button?.image = NSImage(systemSymbolName: "dollarsign", accessibilityDescription: nil)
+                //self.statusBarItem?.button?.image = NSImage(systemSymbolName: "dollarsign", accessibilityDescription: nil)
+                self.statusBarItem?.button?.title = "🇺🇸"
                 self.soundManager.play(soundName: "en")
             } else {
-                self.statusBarItem?.button?.image = NSImage(systemSymbolName: "rublesign", accessibilityDescription: nil)
+                //self.statusBarItem?.button?.image = NSImage(systemSymbolName: "rublesign", accessibilityDescription: nil)
+                self.statusBarItem?.button?.title = "🇷🇺"
                 self.soundManager.play(soundName: "ru")
             }
         }
@@ -138,15 +170,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             languages: [currentLanguage]
         )
         print(spelling)
-        
-        variants = spelling[lastWord]
-        
+        self.variants = spelling[lastWord]
         guard let variants = variants, !variants.isEmpty else { return }
-        
         soundManager.play(soundName: "misprint")
-        
+    }
+    private func showSpellingMenu() {
         let corrMenu = NSMenu()
-        for (index, suggestion) in variants.enumerated() {
+        for (index, suggestion) in self.variants!.enumerated() {
             let menuItem = NSMenuItem(title: suggestion, action: #selector(variantChosen(_:)), keyEquivalent: "")
             menuItem.tag = index
             corrMenu.addItem(menuItem)
@@ -193,6 +223,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     @objc private func hideStatusBarIcon() {
         statusBarItem?.isVisible = false
+        let userDefaults = UserDefaults.standard
+        userDefaults.set(true, forKey: "hideStatusBarIcon")
+        UserDefaults.standard.synchronize()
     }
     
     @objc private func exitAction() {

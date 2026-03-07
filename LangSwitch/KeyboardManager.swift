@@ -61,9 +61,38 @@ final class KeyboardManager {
     
     private(set) var currentLanguage: String = "en"
     private(set) var currentSource: String = "ABC"
-    private(set) var isShiftPressed: Bool = false
+    private(set) var isShiftPressed: Bool = false    
+    private(set) var flags: [[String]] = [
+        ["English","en","🇺🇸"],
+        ["German", "de","🇩🇪"],
+        ["French", "fr","🇫🇷"],
+        ["Spanish","es","🇪🇸"],
+        ["Italian","it","🇮🇹"],
+        ["Portuguese","pt","🇵🇹"],
+        ["Dutch","nl","🇳🇱"],
+        ["Polish","pl","🇵🇱"],
+        ["Russian","ru","🇷🇺"],
+        ["Ukrainian","uk","🇺🇦"],
+        ["Czech","cs","🇨🇿"],
+        ["Romanian","ro","🇷🇴"],
+        ["Hungarian","hu","🇭🇺"],
+        ["Swedish","sv","🇸🇪"],
+        ["Danish","da","🇩🇰"],
+        ["Finnish","fi","🇫🇮"],
+        ["Norwegian","no","🇳🇴"],
+        ["Greek","el","🇬🇷"],
+        ["Bulgarian","bg","🇧🇬"],
+        ["Slovak","sk","🇸🇰"],
+        ["Croatian","hr","🇭🇷"],
+        ["Serbian","sr","🇷🇸"],
+        ["Turkish","tr","🇹🇷"],
+    ]
     
     var onLanguageChanged: ((String) -> Void)?
+    
+    func flag(for code: String) -> String? {
+        return "🇹🇷"
+    }
     
     func simulateKeyPress(_ keyCode: Int) {
         var key = keyCode
