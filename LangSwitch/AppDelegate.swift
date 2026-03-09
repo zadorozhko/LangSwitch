@@ -59,10 +59,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func setupStatusBar() {
         NSApplication.shared.setActivationPolicy(.accessory)
         
-        statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength + 1)
+        statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         //statusBarItem?.button?.image = NSImage(systemSymbolName: "dollarsign", accessibilityDescription: nil)
         let fontSize: CGFloat = 21.0 // Flag icon size
-        self.statusBarItem?.button?.frame = CGRectMake(0.0, -8.0, 10.0, 8.0)
+        //self.statusBarItem?.button?.frame = CGRectMake(0.0, 0.0, 10.0, 8.0)
         self.statusBarItem?.button?.font = NSFont.systemFont(ofSize: fontSize)
         self.statusBarItem?.button?.title = "🇺🇸"
         statusBarItem?.isVisible = true

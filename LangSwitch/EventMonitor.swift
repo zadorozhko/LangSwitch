@@ -60,9 +60,11 @@ final class EventMonitor {
         keyDownMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
             self?.handleKeyDown(event)
         }
-        
         flagsChangedMonitor = NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
             self?.handleFlagsChanged(event)
+        }
+        mouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
+            self?.handleMouseEvent(event)
         }
     }
     
@@ -79,6 +81,10 @@ final class EventMonitor {
             NSEvent.removeMonitor(monitor)
             mouseMonitor = nil
         }
+    }
+    
+    private func handleMouseEvent(_ event: NSEvent){
+        contextProvider.flush();
     }
     
     private func handleKeyDown(_ event: NSEvent) {

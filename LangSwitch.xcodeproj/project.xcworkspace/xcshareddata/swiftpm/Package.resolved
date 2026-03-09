@@ -1,0 +1,15 @@
+{
+  "originHash" : "2278d39267ea61d7284a121e142c2310fd078f593710444a53fce03e6cc375d5",
+  "pins" : [
+    {
+      "identity" : "symspellswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/gdetari/SymSpellSwift.git",
+      "state" : {
+        "revision" : "673246e16338440f6895e119bfacab308d11fce0",
+        "version" : "0.1.4"
+      }
+    }
+  ],
+  "version" : 3
+}
