@@ -64,7 +64,7 @@ internal final class ContextProvider {
     func switchContext(ctx:NSRunningApplication, currLang:String){ //called on focus change
         ctxLang[self.currentContext ?? "none"] = currLang; // save prev ctx lang
         self.currentContext = ctx.bundleIdentifier;        // get new ctx
-        scancodes[self.currentContext!]?.removeAll();
+        scancodes[self.currentContext ?? "none"]?.removeAll();
     }
     
     func backspace(){
@@ -78,7 +78,11 @@ internal final class ContextProvider {
     }
     
     func flush(){
-        scancodes[self.currentContext!]?.removeAll() //= []; //TODO: drop scancodes app element
+        if(self.currentContext != nil) {
+            scancodes[self.currentContext!]?.removeAll() //= []; //TODO: drop scancodes app element
+        } else {
+            print("flush: currentContext is nil")
+        }
     }
     
     func appendValue(forKey key: String, value: Int) {
